@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "772449112807",
+    "project_id": "squeaky-database",
+    "storage_bucket": "squeaky-database.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:772449112807:android:1f457394562964d8780842",
+        "android_client_info": {
+          "package_name": "com.example.squeaky_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCpSLx-MyICGLHFjTKxC9lrA4QKOU-HtoE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

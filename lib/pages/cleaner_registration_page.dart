@@ -1,0 +1,244 @@
+// ignore_for_file: use_build_context_synchronously
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:squeaky_app/components/my_button.dart';
+import 'package:squeaky_app/components/my_number_field.dart';
+import 'package:squeaky_app/components/my_text_field.dart';
+import 'package:squeaky_app/objects/user.dart';
+import 'package:squeaky_app/pages/cleaner_registration_page_2.dart';
+
+class CleanerRegistrationPage extends StatelessWidget {
+  const CleanerRegistrationPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    //Controllers
+
+    final passwordController = TextEditingController();
+    final confirmPasswordController = TextEditingController();
+    final emailController = TextEditingController();
+    final phoneController = TextEditingController();
+    final addressController = TextEditingController();
+    final address2Controller = TextEditingController();
+
+    bool isEmail(String em) {
+      String p =
+          r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+
+      RegExp regExp = RegExp(p);
+
+      return regExp.hasMatch(em);
+    }
+
+    //Functions
+    Future<void> handleNextSubmit() async {
+      if (passwordController.text != confirmPasswordController.text) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Error'),
+            content: const Text('Your passwords do not match.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context, rootNavigator: true)
+                      .pop(); // dismisses only the dialog and returns nothing
+                },
+                child: const Text('Ok'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+
+      if (isEmail(emailController.text) == false) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Error'),
+            content: const Text('Please enter a valid email address.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context, rootNavigator: true)
+                      .pop(); // dismisses only the dialog and returns nothing
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+
+      if (passwordController.text.length < 8) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Error'),
+            content: const Text('Password must be at least 8 characters long.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context, rootNavigator: true)
+                      .pop(); // dismisses only the dialog and returns nothing
+                },
+                child: const Text('Ok'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+
+      if (passwordController.text.isEmpty ||
+          addressController.text.isEmpty ||
+          confirmPasswordController.text.isEmpty ||
+          emailController.text.isEmpty ||
+          phoneController.text.isEmpty) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Error'),
+            content: const Text(
+                'Please fill in every box, we need it for your account!'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context, rootNavigator: true)
+                      .pop(); // dismisses only the dialog and returns nothing
+                },
+                child: const Text('Ok'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+
+      AppUser user = AppUser(
+        email: emailController.text,
+        password: passwordController.text,
+        phoneNumber: phoneController.text,
+        address: addressController.text + address2Controller.text,
+        isAdmin: false,
+        isCleaner: true,
+        isCustomer: false,
+        firstTime: false,
+        //true for cleaner page on login, false for customer page
+        startupPage: true,
+      );
+
+      final users = FirebaseFirestore.instance.collection('users');
+      var doc = await users.doc(user.email).get();
+
+      if (doc.exists) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Error'),
+            content: const Text('That email is already registered to an account.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context, rootNavigator: true)
+                      .pop(); // dismisses only the dialog and returns nothing
+                },
+                child: const Text('Ok'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => CleanerRegistrationPage2(user: user)),
+      );
+    }
+
+    return Scaffold(
+        backgroundColor: Colors.grey[200],
+        body: SingleChildScrollView(
+            child: SafeArea(
+                child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(height: 45),
+            const Text(
+              "Registering as a Cleaner",
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Divider(
+                      thickness: 0.5,
+                      color: Colors.blue[300],
+                    ),
+                  ),
+                  const Text('Enter your information below'),
+                  Expanded(
+                    child: Divider(
+                      thickness: 0.5,
+                      color: Colors.blue[300],
+                    ),
+                  )
+                ],
+              ),
+            ),
+            MyTextField(
+              controller: emailController,
+              hintText: 'Your preferred email address',
+              obscureText: false,
+              label: "Email",
+            ),
+            MyTextField(
+              controller: passwordController,
+              hintText: 'Your desired password',
+              obscureText: true,
+              label: "Password",
+            ),
+            MyTextField(
+              controller: confirmPasswordController,
+              hintText: 'Confirm password',
+              obscureText: true,
+              label: "Confirm Password",
+            ),
+            MyNumberField(
+              controller: phoneController,
+              hintText: 'Your preferred contact phone number',
+              obscureText: false,
+              label: "Phone",
+            ),
+            MyTextField(
+              controller: addressController,
+              hintText: 'Address line 1',
+              obscureText: false,
+              label: "Address Line 1",
+            ),
+            MyTextField(
+              controller: address2Controller,
+              hintText: 'Address line 2 (optional)',
+              obscureText: false,
+              label: "Address Line 2",
+            ),
+            MyButton(
+                text: "Next",
+                onPressed: handleNextSubmit,
+                color: Colors.blue[300]!),
+            const SizedBox(height: 25),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              GestureDetector(
+                  child: const Text('Go Back'),
+                  onTap: () => Navigator.pop(context))
+            ])
+          ],
+        ))));
+  }
+}
