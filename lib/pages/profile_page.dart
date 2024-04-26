@@ -1,103 +1,94 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+// ignore_for_file: public_member_api_docs, sort_constructors_first, library_private_types_in_public_api
+import 'dart:typed_data';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:squeaky_app/components/my_appbar.dart';
 import 'package:squeaky_app/components/my_gnav_bar.dart';
 import 'package:squeaky_app/objects/user.dart';
+import 'package:squeaky_app/util/utils.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key, required this.user});
   final AppUser user;
 
   @override
+  _ProfilePage createState() => _ProfilePage();
+}
+
+class _ProfilePage extends State<ProfilePage> {
+  Uint8List? _image;
+
+  void selectImage() async {
+    try {
+      Uint8List img = await pickImage(ImageSource.gallery);
+      setState(() {
+        _image = img;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.black,
-        title: const Text("PROFILE"),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.settings_rounded),
-          )
-        ],
-      ),
+      appBar: MyAppBar(user: widget.user),
+      backgroundColor: Colors.grey[200],
       body: ListView(
         padding: const EdgeInsets.all(10),
         children: [
-          // COLUMN THAT WILL CONTAIN THE PROFILE
           Column(
             children: [
-              const CircleAvatar(
-                radius: 50,
-                backgroundImage: NetworkImage(
-                  "https://images.unsplash.com/photo-1554151228-14d9def656e4?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=386&q=80",
-                ),
+              const SizedBox(
+                height: 20,
+              ),
+              Stack(
+                children: [
+                  _image == null
+                      ? const CircleAvatar(
+                          backgroundColor: Colors.grey,
+                          radius: 50,
+                          child: Icon(
+                            Icons.person_2_outlined,
+                            size: 50,
+                            color: Colors.black,
+                          ),
+                        )
+                      : CircleAvatar(
+                          radius: 50,
+                          backgroundImage: MemoryImage(_image!),
+                        ),
+                  Positioned(
+                    bottom: -15,
+                    right: -5,
+                    child: IconButton(
+                        icon: const Icon(
+                          Icons.camera_alt_rounded,
+                          color: Colors.black,
+                        ),
+                        onPressed: selectImage,
+                        color: Colors.black),
+                  ),
+                ],
               ),
               const SizedBox(height: 10),
               Text(
-                "${user.firstName} ${user.lastName}",
+                "${widget.user.firstName} ${widget.user.lastName}",
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
-                user.email,
+                widget.user.email,
                 style: const TextStyle(
                   fontSize: 14,
                   color: Colors.black54,
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 25),
-          SizedBox(
-            height: 180,
-            child: ListView.separated(
-              physics: const BouncingScrollPhysics(),
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (context, index) {
-                final card = profileCompletionCards[index];
-                return SizedBox(
-                  width: 160,
-                  child: Card(
-                    shadowColor: Colors.black12,
-                    child: Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: Column(
-                        children: [
-                          Icon(
-                            card.icon,
-                            size: 30,
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            card.title,
-                            textAlign: TextAlign.center,
-                          ),
-                          const Spacer(),
-                          ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
-                            ),
-                            child: Text(card.buttonText),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-              separatorBuilder: (context, index) =>
-                  const Padding(padding: EdgeInsets.only(right: 5)),
-              itemCount: profileCompletionCards.length,
-            ),
           ),
           const SizedBox(height: 35),
           ...List.generate(
@@ -107,8 +98,9 @@ class ProfilePage extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 5),
                 child: Card(
-                  elevation: 4,
+                  elevation: 5,
                   shadowColor: Colors.black12,
+                  surfaceTintColor: Colors.transparent,
                   child: ListTile(
                     leading: Icon(tile.icon),
                     title: Text(tile.title),
@@ -120,38 +112,15 @@ class ProfilePage extends StatelessWidget {
           )
         ],
       ),
-      bottomNavigationBar: MyGnavBar(currentPageIndex: 2, user: user),
+      bottomNavigationBar: MyGnavBar(currentPageIndex: 2, user: widget.user),
     );
   }
 }
 
-class ProfileCompletionCard {
-  final String title;
-  final String buttonText;
-  final IconData icon;
-  ProfileCompletionCard({
-    required this.title,
-    required this.buttonText,
-    required this.icon,
-  });
-}
-
-List<ProfileCompletionCard> profileCompletionCards = [
-  ProfileCompletionCard(
-    title: "Set Your Profile Details",
-    icon: CupertinoIcons.person_circle,
-    buttonText: "Continue",
-  ),
-  ProfileCompletionCard(
-    title: "Add your skills",
-    icon: CupertinoIcons.square_list,
-    buttonText: "Add",
-  ),
-];
-
 class CustomListTile {
   final IconData icon;
   final String title;
+
   CustomListTile({
     required this.icon,
     required this.title,
@@ -161,11 +130,19 @@ class CustomListTile {
 List<CustomListTile> customListTiles = [
   CustomListTile(
     icon: Icons.insights,
-    title: "Bookings",
+    title: "Appointments",
   ),
   CustomListTile(
-    icon: Icons.location_on_outlined,
-    title: "Location",
+    icon: Icons.person,
+    title: "Account details",
+  ),
+  CustomListTile(
+    title: "Payment information",
+    icon: CupertinoIcons.money_dollar_circle,
+  ),
+  CustomListTile(
+    title: "Legal",
+    icon: CupertinoIcons.book_solid,
   ),
   CustomListTile(
     title: "Logout",

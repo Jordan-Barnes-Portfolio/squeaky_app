@@ -109,24 +109,35 @@ class ChatService extends ChangeNotifier {
   }
 
   String readTimestamp(int timestamp) {
-    var now = DateTime.now();
     var format = DateFormat('HH:mm a');
     var date = DateTime.fromMicrosecondsSinceEpoch(timestamp * 1000);
-    var diff = date.difference(now);
-    var time = '';
+    var now = DateTime.now();
+    var yesterday = DateTime(now.year, now.month, now.day - 1);
+    var twoDaysAgo = DateTime(now.year, now.month, now.day - 2);
 
-    if (diff.inSeconds <= 0 ||
-        diff.inSeconds > 0 && diff.inMinutes == 0 ||
-        diff.inMinutes > 0 && diff.inHours == 0 ||
-        diff.inHours > 0 && diff.inDays == 0) {
-      time = format.format(date);
-    } else {
-      if (diff.inDays == 1) {
-        time = '${diff.inDays}DAY AGO';
-      } else {
-        time = '${diff.inDays}DAYS AGO';
-      }
+    if(date.day == now.day && date.month == now.month && date.year == now.year){
+      return format.format(date);
     }
-    return time;
+    else if (date.isAfter(yesterday)) {
+      return 'Yesterday';
+    } else if (date.isAfter(twoDaysAgo)) {
+      return DateFormat('EEEE, dd MMMM').format(date);
+    } else if (date.year != now.year) {
+      return DateFormat('EEEE, dd MMMM yyyy').format(date);
+    } else {
+      return DateFormat('EEEE, dd MMMM').format(date);
+    }
+
+  }
+
+  Future<void> updateChatRoomTimes(String userId) async {
+    QuerySnapshot snapshot = await _firestore.collection('chats').get();
+    snapshot.docs.forEach((element) {
+      if (element['users'].contains(userId)) {
+        element.reference.update({
+          'formattedTime': readTimestamp(element['unformattedTime'].millisecondsSinceEpoch),
+        });
+      }
+    });
   }
 }

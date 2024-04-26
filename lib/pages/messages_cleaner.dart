@@ -28,6 +28,7 @@ class _CleanerMessagesPage extends State<CleanerMessagesPage> {
     // Add your logic to refresh the data here
     // For example, you can call the getData() method again
     await widget.getData();
+    ChatService().updateChatRoomTimes(widget.user.email);
   }
 
   @override

@@ -28,6 +28,7 @@ class _CustomerMessagesPage extends State<CustomerMessagesPage> {
     // Add your logic to refresh the data here
     // For example, you can call the getData() method again
     await widget.getData();
+    ChatService().updateChatRoomTimes(widget.user.email);
   }
 
   @override

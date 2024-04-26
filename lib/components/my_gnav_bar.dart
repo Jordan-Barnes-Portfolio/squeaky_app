@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/account_settings_page.dart';
 import 'package:squeaky_app/pages/cleaner_main_page.dart';
 import 'package:squeaky_app/pages/customer_main_page.dart';
 import 'package:squeaky_app/pages/messages_cleaner.dart';
@@ -55,7 +54,7 @@ class MyGnavBar extends StatelessWidget {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => AccountSettingsPage(user: user)));
+                      builder: (context) => ProfilePage(user: user)));
             }
           },
         );
