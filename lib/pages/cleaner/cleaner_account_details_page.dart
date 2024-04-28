@@ -29,10 +29,13 @@ class _CleanerAccountDetailsPage extends State<CleanerAccountDetailsPage> {
           .collection('users')
           .where('email', isEqualTo: widget.user.email)
           .get();
-      Reference ref = storage.ref().child("images/${widget.user.hashCode}");
+      Reference ref = storage.ref().child("images/${widget.user.email}");
       UploadTask uploadTask = ref.putFile(imageFile);
       await uploadTask.whenComplete(() async {
         var url = await ref.getDownloadURL();
+        if(widget.user.profilePhoto != "none"){
+          await FirebaseStorage.instance.refFromURL(widget.user.profilePhoto).delete();
+        }
         widget.user.profilePhoto = url.toString();
         await userRef.then((value) {
           for (var element in value.docs) {

@@ -4,8 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/cleaner_main_page.dart';
-import 'package:squeaky_app/pages/customer_main_page.dart';
+import 'package:squeaky_app/pages/cleaner/cleaner_main_page.dart';
+import 'package:squeaky_app/pages/customer/customer_main_page.dart';
 import 'package:squeaky_app/pages/login_page.dart';
 import 'package:squeaky_app/services/authentication_service.dart';
 

@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:squeaky_app/components/my_button.dart';
 import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/customer_registration_page_3.dart';
+import 'package:squeaky_app/pages/customer/customer_registration_page_3.dart';
 
 class CustomerRegistrationPage2 extends StatefulWidget {
   final AppUser user; // AppUser object

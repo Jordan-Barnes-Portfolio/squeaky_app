@@ -1,25 +1,31 @@
 // ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:squeaky_app/components/my_button.dart';
+import 'package:squeaky_app/components/my_drop_down_field.dart';
 import 'package:squeaky_app/components/my_number_field.dart';
 import 'package:squeaky_app/components/my_text_field.dart';
 import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/cleaner_registration_page_2.dart';
+import 'package:squeaky_app/pages/customer/customer_registration_page_2.dart';
 
-class CleanerRegistrationPage extends StatelessWidget {
-  const CleanerRegistrationPage({super.key});
+class CustomerRegistrationPage extends StatelessWidget {
+  const CustomerRegistrationPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     //Controllers
-
     final passwordController = TextEditingController();
     final confirmPasswordController = TextEditingController();
     final emailController = TextEditingController();
     final phoneController = TextEditingController();
+    final firstnameController = TextEditingController();
+    final lastnameController = TextEditingController();
     final addressController = TextEditingController();
     final address2Controller = TextEditingController();
+    final zipCodeController = TextEditingController();
+    final cityController = TextEditingController();
+    final stateController = TextEditingController();
 
     bool isEmail(String em) {
       String p =
@@ -38,6 +44,27 @@ class CleanerRegistrationPage extends StatelessWidget {
           builder: (context) => AlertDialog(
             title: const Text('Error'),
             content: const Text('Your passwords do not match.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context, rootNavigator: true)
+                      .pop(); // dismisses only the dialog and returns nothing
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+
+      if (firstnameController.text.length > 12) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Error'),
+            content: const Text(
+                'Sorry, your first name is longer than 12 characters.. can you shorten it?'),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
@@ -72,31 +99,15 @@ class CleanerRegistrationPage extends StatelessWidget {
         return;
       }
 
-      if (passwordController.text.length < 8) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Error'),
-            content: const Text('Password must be at least 8 characters long.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context, rootNavigator: true)
-                      .pop(); // dismisses only the dialog and returns nothing
-                },
-                child: const Text('Ok'),
-              ),
-            ],
-          ),
-        );
-        return;
-      }
-
       if (passwordController.text.isEmpty ||
-          addressController.text.isEmpty ||
-          confirmPasswordController.text.isEmpty ||
           emailController.text.isEmpty ||
-          phoneController.text.isEmpty) {
+          phoneController.text.isEmpty ||
+          firstnameController.text.isEmpty ||
+          addressController.text.isEmpty ||
+          lastnameController.text.isEmpty ||
+          cityController.text.isEmpty ||
+          stateController.text.isEmpty ||
+          zipCodeController.text.isEmpty) {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -117,17 +128,37 @@ class CleanerRegistrationPage extends StatelessWidget {
         return;
       }
 
+      if (passwordController.text.length < 8) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Error'),
+            content: const Text('Password must be at least 8 characters long.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context, rootNavigator: true)
+                      .pop(); // dismisses only the dialog and returns nothing
+                },
+                child: const Text('Ok'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+
       AppUser user = AppUser(
         email: emailController.text,
         password: passwordController.text,
         phoneNumber: phoneController.text,
-        address: addressController.text + address2Controller.text,
+        firstName: firstnameController.text,
+        lastName: lastnameController.text,
+        address:
+            "${addressController.text} ${address2Controller.text} ${cityController.text}, ${stateController.text} ${zipCodeController.text}",
         isAdmin: false,
-        isCleaner: true,
-        isCustomer: false,
-        firstTime: false,
-        //true for cleaner page on login, false for customer page
-        startupPage: true,
+        isCleaner: false,
+        isCustomer: true,
       );
 
       final users = FirebaseFirestore.instance.collection('users');
@@ -138,7 +169,8 @@ class CleanerRegistrationPage extends StatelessWidget {
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('Error'),
-            content: const Text('That email is already registered to an account.'),
+            content: const Text(
+                'Email is already registered, choose a different one or recover your password.'),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
@@ -156,7 +188,7 @@ class CleanerRegistrationPage extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => CleanerRegistrationPage2(user: user)),
+            builder: (context) => CustomerRegistrationPage2(user: user)),
       );
     }
 
@@ -165,11 +197,11 @@ class CleanerRegistrationPage extends StatelessWidget {
         body: SingleChildScrollView(
             child: SafeArea(
                 child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 45),
             const Text(
-              "Registering as a Cleaner",
+              textAlign: TextAlign.center,
+              "Let's clean your home!",
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
             ),
             Padding(
@@ -210,11 +242,17 @@ class CleanerRegistrationPage extends StatelessWidget {
               obscureText: true,
               label: "Confirm Password",
             ),
-            MyNumberField(
-              controller: phoneController,
-              hintText: 'Your preferred contact phone number',
+            MyTextField(
+              controller: firstnameController,
+              hintText: 'First Name',
               obscureText: false,
-              label: "Phone",
+              label: "First Name",
+            ),
+            MyTextField(
+              controller: lastnameController,
+              hintText: 'Last Name',
+              obscureText: false,
+              label: "Last Name",
             ),
             MyTextField(
               controller: addressController,
@@ -222,11 +260,97 @@ class CleanerRegistrationPage extends StatelessWidget {
               obscureText: false,
               label: "Address Line 1",
             ),
+            Row(
+              children: [
+                Expanded(
+                  child: MyTextField(
+                    controller: cityController,
+                    hintText: 'City',
+                    obscureText: false,
+                    label: "City",
+                  ),
+                ),
+                Expanded(
+                  child: MyDropDownField(
+                    controller: stateController,
+                    hintText: 'State',
+                    obscureText: false,
+                    label: "State",
+                    options: const <String>[
+                      'AL',
+                      'AK',
+                      'AZ',
+                      'AR',
+                      'CA',
+                      'CO',
+                      'CT',
+                      'DE',
+                      'FL',
+                      'GA',
+                      'HI',
+                      'ID',
+                      'IL',
+                      'IN',
+                      'IA',
+                      'KS',
+                      'KY',
+                      'LA',
+                      'ME',
+                      'MD',
+                      'MA',
+                      'MI',
+                      'MN',
+                      'MS',
+                      'MO',
+                      'MT',
+                      'NE',
+                      'NV',
+                      'NH',
+                      'NJ',
+                      'NM',
+                      'NY',
+                      'NC',
+                      'ND',
+                      'OH',
+                      'OK',
+                      'OR',
+                      'PA',
+                      'RI',
+                      'SC',
+                      'SD',
+                      'TN',
+                      'TX',
+                      'UT',
+                      'VT',
+                      'VA',
+                      'WA',
+                      'WV',
+                      'WI',
+                      'WY'
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: MyNumberField(
+                    controller: zipCodeController,
+                    hintText: 'Zip Code',
+                    obscureText: false,
+                    label: "Zip Code",
+                  ),
+                ),
+              ],
+            ),
             MyTextField(
               controller: address2Controller,
               hintText: 'Address line 2 (optional)',
               obscureText: false,
               label: "Address Line 2",
+            ),
+            MyNumberField(
+              controller: phoneController,
+              hintText: 'Your preferred contact phone number',
+              obscureText: false,
+              label: "Phone",
             ),
             MyButton(
                 text: "Next",
@@ -237,7 +361,8 @@ class CleanerRegistrationPage extends StatelessWidget {
               GestureDetector(
                   child: const Text('Go Back'),
                   onTap: () => Navigator.pop(context))
-            ])
+            ]),
+            const SizedBox(height: 25),
           ],
         ))));
   }

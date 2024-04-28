@@ -9,8 +9,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:squeaky_app/components/my_appbar.dart';
 import 'package:squeaky_app/components/my_gnav_bar.dart';
 import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/cleaner_account_details_page.dart';
-import 'package:squeaky_app/pages/customer_account_details_page.dart';
+import 'package:squeaky_app/pages/cleaner/cleaner_account_details_page.dart';
+import 'package:squeaky_app/pages/customer/customer_account_details_page.dart';
 import 'package:squeaky_app/services/authentication_gate.dart';
 import 'package:squeaky_app/services/authentication_service.dart';
 import 'package:squeaky_app/util/utils.dart';
@@ -138,7 +138,7 @@ class _ProfilePage extends State<ProfilePage> {
                 surfaceTintColor: Colors.transparent,
                 child: ListTile(
                   leading: Icon(Icons.insights),
-                  title: Text("Appointments"),
+                  title: Text("Past appointments"),
                   trailing: Icon(Icons.chevron_right),
                 ),
               ),

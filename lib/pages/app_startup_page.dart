@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:squeaky_app/components/my_button.dart';
-import 'package:squeaky_app/pages/cleaner_registration_page.dart';
-import 'package:squeaky_app/pages/customer_registration_page.dart';
+import 'package:squeaky_app/pages/cleaner/cleaner_registration_page.dart';
+import 'package:squeaky_app/pages/customer/customer_registration_page.dart';
 import 'package:squeaky_app/pages/login_page.dart';
 
 class AppStartupPage extends StatelessWidget {
@@ -87,7 +87,7 @@ class AppStartupPage extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
                 );
               },
               child: const Text(

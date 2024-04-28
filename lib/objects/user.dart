@@ -1,11 +1,16 @@
 // ignore_for_file: unnecessary_getters_setters
+
 class AppUser {
+
+  //Every account has these parameters
   String _email;
   String _password;
   String _firstName;
   String _lastName;
   String _phoneNumber;
   String _address;
+
+  //These are dependent 
   String _bio;
   String _pricing;
   String _ratings;
@@ -17,12 +22,10 @@ class AppUser {
   String _floorType;
   String _storiesCount;
   String _profilePhoto;
-  bool _startupPage;
-  bool _isAdmin;
+
+  //These are for account type
   bool _isCleaner;
   bool _isCustomer;
-  bool _firstTime;
-
 
   AppUser({
     //Required parameters
@@ -45,10 +48,6 @@ class AppUser {
     String storiesCount = "0",
     String floorType = "none",
     String profilePhoto = "none",
-
-    //If False user goes to customer page, if True user goes to cleaner page
-    bool startupPage = false,
-    
     bool isAdmin = false,
     bool isCleaner = false,
     bool isCustomer = false,
@@ -61,11 +60,8 @@ class AppUser {
         _lastName = lastName,
         _phoneNumber = phoneNumber,
         _address = address,
-        _isAdmin = isAdmin,
         _isCleaner = isCleaner,
         _bio = bio,
-        _startupPage = startupPage,
-        _firstTime = firstTime,
         _isCustomer = isCustomer,
         _rating = rating,
         _ratings = ratings,
@@ -77,7 +73,6 @@ class AppUser {
         _storiesCount = storiesCount,
         _profilePhoto = profilePhoto,
         _houseType = houseType;
-
 
   //Getters and setters
   String get profilePhoto => _profilePhoto;
@@ -101,17 +96,11 @@ class AppUser {
   String get sqftOfHome => _sqftOfHome;
   set sqftOfHome(String value) => _sqftOfHome = value;
 
-  bool get firstTime => _firstTime;
-  set firstTime(bool value) => _firstTime = value;
-
   String get rating => _rating;
   set rating(String value) => _rating = value;
 
   String get ratings => _ratings;
   set ratings(String value) => _ratings = value;
-
-  bool get startupPage => _startupPage;
-  set startupPage(bool value) => _startupPage = value;
 
   String get pricing => _pricing;
   set pricing(String value) => _pricing = value;
@@ -134,9 +123,6 @@ class AppUser {
   String get address => _address;
   set address(String value) => _address = value;
 
-  bool get isAdmin => _isAdmin;
-  set isAdmin(bool value) => _isAdmin = value;
-
   bool get isCleaner => _isCleaner;
   set isCleaner(bool value) => _isCleaner = value;
 
@@ -145,11 +131,6 @@ class AppUser {
 
   String get bio => _bio;
   set bio(String value) => _bio = value;
-
-  @override
-  String toString() {
-    return 'AppUser(email: $_email, password: $_password, firstName: $_firstName, lastName: $_lastName, phoneNumber: $_phoneNumber, address: $_address, isAdmin: $_isAdmin, isCleaner: $_isCleaner, isCustomer: $_isCustomer, bio: $_bio, pricing: $_pricing, amountOfBedrooms: $_amountOfBedrooms, amountOfBathrooms: $_amountOfBathrooms, sqftOfHome: $_sqftOfHome, startupPage: $_startupPage, firstTime: $_firstTime, rating: $_rating, ratings: $_ratings, houseType: $_houseType)';
-  }
 
   Map<String, dynamic> toMap() {
     return {
@@ -161,11 +142,8 @@ class AppUser {
       'address': _address,
       'bio': _bio,
       'pricing': _pricing,
-      'startupPage': _startupPage,
-      'isAdmin': _isAdmin,
       'isCleaner': _isCleaner,
       'isCustomer': _isCustomer,
-      'firstTime': _firstTime,
       'rating': _rating,
       'ratings': _ratings,
       'amountOfBedrooms': _amountOfBedrooms,
@@ -194,11 +172,8 @@ class AppUser {
       amountOfBedrooms: map['amountOfBedrooms'] as String,
       sqftOfHome: map['sqftOfHome'] as String,
       houseType: map['houseType'] as String,
-      startupPage: map['startupPage'] as bool,
-      isAdmin: map['isAdmin'] as bool,
       isCleaner: map['isCleaner'] as bool,
       isCustomer: map['isCustomer'] as bool,
-      firstTime: map['firstTime'] as bool,
       rating: map['rating'] as String,
       ratings: map['ratings'] as String,
       profilePhoto: map['profilePhoto'] as String,

@@ -32,7 +32,7 @@ class _CleanerMessagesPage extends State<CleanerMessagesPage> {
   }
 
   @override
-  initState(){
+  initState() {
     super.initState();
     widget.getData();
     ChatService().updateChatRoomTimes(widget.user.email);
@@ -51,7 +51,9 @@ class _CleanerMessagesPage extends State<CleanerMessagesPage> {
           child: StreamBuilder<QuerySnapshot>(
             stream: ChatService().getChatRooms(widget.user.email),
             builder: (context, snapshot) {
-              if (!snapshot.hasData) {
+              if (snapshot.data == null) {
+                return const Center(child: Text('No messages..'));
+              } else if (snapshot.data!.docs.isEmpty) {
                 return const Center(child: Text('No messages..'));
               }
               final documents = snapshot.data!.docs;
@@ -73,21 +75,21 @@ class _CleanerMessagesPage extends State<CleanerMessagesPage> {
                 itemBuilder: (context, index) {
                   final data = documents[index].data() as Map<String, dynamic>;
                   return MessagesCard(
-                    customFunction: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ChatPage(
-                                  receiverFirstName: data['customerFirstName'],
-                                  recieverUserEmail: data['userEmails']
-                                      ['customer'],
-                                  user: widget.user)));
-                    },
-                    name: data['customerFirstName'],
-                    lastMessage: data['lastMessage'],
-                    time: data['formattedTime'],
-                    recieverEmail: data['userEmails']['customer']
-                  );
+                      customFunction: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ChatPage(
+                                    receiverFirstName:
+                                        data['customerFirstName'],
+                                    recieverUserEmail: data['userEmails']
+                                        ['customer'],
+                                    user: widget.user)));
+                      },
+                      name: data['customerFirstName'],
+                      lastMessage: data['lastMessage'],
+                      time: data['formattedTime'],
+                      recieverEmail: data['userEmails']['customer']);
                 },
               );
             },

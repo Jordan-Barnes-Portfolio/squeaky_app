@@ -51,7 +51,9 @@ class _CustomerMessagesPage extends State<CustomerMessagesPage> {
           child: StreamBuilder<QuerySnapshot>(
             stream: ChatService().getChatRooms(widget.user.email),
             builder: (context, snapshot) {
-              if (!snapshot.hasData) {
+              if (snapshot.data == null) {
+                return const Center(child: Text('No messages..'));
+              } else if (snapshot.data!.docs.isEmpty) {
                 return const Center(child: Text('No messages..'));
               }
               final documents = snapshot.data!.docs;

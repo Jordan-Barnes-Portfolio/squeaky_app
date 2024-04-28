@@ -48,8 +48,8 @@ class _CustomerMainPage extends State<CustomerMainPage> {
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const SizedBox(height: 10),
-            Container(alignment: Alignment.center,
-            child: _buildCurrentAppointment()),
+            Container(
+                alignment: Alignment.center, child: _buildCurrentAppointment()),
             const SizedBox(height: 10),
             const Divider(),
             _buildCleanerList(),
@@ -71,15 +71,20 @@ class _CustomerMainPage extends State<CustomerMainPage> {
             child: ListView.builder(
           itemCount: documents.length,
           itemBuilder: (context, index) {
-            final document = documents[index];
-            final data = document.data() as Map<String, dynamic>;
-            if (data['isCleaner'] != true) {
-              return const SizedBox.shrink();
+            if (documents.length <= 1) {
+              return const Center(child: Text('No cleaners available in your area.. yet.'));
+            } else {
+              print(documents);
+              final document = documents[index];
+              final data = document.data() as Map<String, dynamic>;
+              if (data['isCleaner'] != true) {
+                return const SizedBox.shrink();
+              }
+              return CleanerCard(
+                cleaner: AppUser.fromMap(data),
+                user: widget.user,
+              );
             }
-            return CleanerCard(
-              cleaner: AppUser.fromMap(data),
-              user: widget.user,
-            );
           },
         ));
       },
