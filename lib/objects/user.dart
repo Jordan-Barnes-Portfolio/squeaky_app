@@ -16,6 +16,7 @@ class AppUser {
   String _houseType;
   String _floorType;
   String _storiesCount;
+  String _profilePhoto;
   bool _startupPage;
   bool _isAdmin;
   bool _isCleaner;
@@ -43,9 +44,11 @@ class AppUser {
     String houseType = "none",
     String storiesCount = "0",
     String floorType = "none",
+    String profilePhoto = "none",
 
     //If False user goes to customer page, if True user goes to cleaner page
     bool startupPage = false,
+    
     bool isAdmin = false,
     bool isCleaner = false,
     bool isCustomer = false,
@@ -72,9 +75,13 @@ class AppUser {
         _sqftOfHome = sqftOfHome,
         _floorType = floorType,
         _storiesCount = storiesCount,
+        _profilePhoto = profilePhoto,
         _houseType = houseType;
 
+
   //Getters and setters
+  String get profilePhoto => _profilePhoto;
+  set profilePhoto(String value) => _profilePhoto = value;
 
   String get storiesCount => _storiesCount;
   set storiesCount(String value) => _storiesCount = value;
@@ -167,6 +174,7 @@ class AppUser {
       'houseType': _houseType,
       'storiesCount': _storiesCount,
       'floorType': _floorType,
+      'profilePhoto': _profilePhoto,
     };
   }
 
@@ -193,6 +201,7 @@ class AppUser {
       firstTime: map['firstTime'] as bool,
       rating: map['rating'] as String,
       ratings: map['ratings'] as String,
+      profilePhoto: map['profilePhoto'] as String,
     );
   }
 }

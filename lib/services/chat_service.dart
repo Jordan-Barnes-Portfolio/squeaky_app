@@ -132,12 +132,12 @@ class ChatService extends ChangeNotifier {
 
   Future<void> updateChatRoomTimes(String userId) async {
     QuerySnapshot snapshot = await _firestore.collection('chats').get();
-    snapshot.docs.forEach((element) {
+    for (var element in snapshot.docs) {
       if (element['users'].contains(userId)) {
         element.reference.update({
           'formattedTime': readTimestamp(element['unformattedTime'].millisecondsSinceEpoch),
         });
       }
-    });
+    }
   }
 }

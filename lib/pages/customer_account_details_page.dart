@@ -9,21 +9,17 @@ import 'package:image_picker/image_picker.dart';
 import 'package:squeaky_app/components/my_appbar.dart';
 import 'package:squeaky_app/components/my_gnav_bar.dart';
 import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/cleaner_account_details_page.dart';
-import 'package:squeaky_app/pages/customer_account_details_page.dart';
-import 'package:squeaky_app/services/authentication_gate.dart';
-import 'package:squeaky_app/services/authentication_service.dart';
 import 'package:squeaky_app/util/utils.dart';
 
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key, required this.user});
+class CustomerAccountDetailsPage extends StatefulWidget {
+  const CustomerAccountDetailsPage({super.key, required this.user});
   final AppUser user;
 
   @override
-  _ProfilePage createState() => _ProfilePage();
+  _CustomerAccountDetailsPage createState() => _CustomerAccountDetailsPage();
 }
 
-class _ProfilePage extends State<ProfilePage> {
+class _CustomerAccountDetailsPage extends State<CustomerAccountDetailsPage> {
   void selectImage() async {
     try {
       String image = await pickImage(ImageSource.gallery);
@@ -118,7 +114,8 @@ class _ProfilePage extends State<ProfilePage> {
               ),
             ],
           ),
-          const SizedBox(height: 35),
+          const SizedBox(height: 20),
+          Text('Tap to edit any details...', style: TextStyle(color: Colors.grey[600])),
           Padding(
             padding: const EdgeInsets.only(bottom: 5),
             child: InkWell(
@@ -132,39 +129,14 @@ class _ProfilePage extends State<ProfilePage> {
                 //   ),
                 // );
               },
-              child: const Card(
+              child: Card(
                 elevation: 5,
                 shadowColor: Colors.black12,
                 surfaceTintColor: Colors.transparent,
                 child: ListTile(
-                  leading: Icon(Icons.insights),
-                  title: Text("Appointments"),
-                  trailing: Icon(Icons.chevron_right),
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 5),
-            child: InkWell(
-              onTap: () {
-                  Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => widget.user.isCleaner
-                        ? CleanerAccountDetailsPage(user: widget.user)
-                        : CustomerAccountDetailsPage(user: widget.user)
-                  ),
-                );
-              },
-              child: const Card(
-                elevation: 5,
-                shadowColor: Colors.black12,
-                surfaceTintColor: Colors.transparent,
-                child: ListTile(
-                  leading: Icon(Icons.person),
-                  title: Text("Account Details"),
-                  trailing: Icon(Icons.chevron_right),
+                  leading: const Icon(Icons.email),
+                  title: Text("Email: ${widget.user.email}"),
+                  trailing: const Icon(Icons.chevron_right),
                 ),
               ),
             ),
@@ -176,20 +148,20 @@ class _ProfilePage extends State<ProfilePage> {
                 //   Navigator.push(
                 //   context,
                 //   MaterialPageRoute(
-                //     builder: (context) => PaymentDetailsPage(user: widget.user)
+                //     builder: (context) => widget.user.isCleaner
+                //         ? CustomerAppointmentsPage(user: widget.user)
+                //         : CleanerAppointmentsPage(user: widget.user)
                 //   ),
                 // );
               },
-              child: const Card(
+              child: Card(
                 elevation: 5,
                 shadowColor: Colors.black12,
                 surfaceTintColor: Colors.transparent,
                 child: ListTile(
-                  leading: Icon(
-                    CupertinoIcons.money_dollar_circle,
-                  ),
-                  title: Text("Payment Information"),
-                  trailing: Icon(Icons.chevron_right),
+                  leading: const Icon(CupertinoIcons.location_fill),
+                  title: Text("Address: ${widget.user.address}"),
+                  trailing: const Icon(Icons.chevron_right),
                 ),
               ),
             ),
@@ -201,18 +173,45 @@ class _ProfilePage extends State<ProfilePage> {
                 //   Navigator.push(
                 //   context,
                 //   MaterialPageRoute(
-                //     builder: (context) => LegalPage(user: widget.user)
+                //     builder: (context) => widget.user.isCleaner
+                //         ? CustomerAppointmentsPage(user: widget.user)
+                //         : CleanerAppointmentsPage(user: widget.user)
                 //   ),
                 // );
               },
-              child: const Card(
+              child: Card(
                 elevation: 5,
                 shadowColor: Colors.black12,
                 surfaceTintColor: Colors.transparent,
                 child: ListTile(
-                  leading: Icon(CupertinoIcons.book_solid),
-                  title: Text("Legal"),
-                  trailing: Icon(Icons.chevron_right),
+                  leading: const Icon(Icons.person_2),
+                  title: Text("Full name: ${widget.user.firstName} ${widget.user.lastName}"),
+                  trailing: const Icon(Icons.chevron_right),
+                ),
+              ),
+            ),
+          ),
+           Padding(
+            padding: const EdgeInsets.only(bottom: 5),
+            child: InkWell(
+              onTap: () {
+                //   Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => widget.user.isCleaner
+                //         ? CustomerAppointmentsPage(user: widget.user)
+                //         : CleanerAppointmentsPage(user: widget.user)
+                //   ),
+                // );
+              },
+              child: Card(
+                elevation: 5,
+                shadowColor: Colors.black12,
+                surfaceTintColor: Colors.transparent,
+                child: ListTile(
+                  leading: const Icon(Icons.bedroom_parent),
+                  title: Text("# Bedrooms: ${widget.user.amountOfBedrooms}"),
+                  trailing: const Icon(Icons.chevron_right),
                 ),
               ),
             ),
@@ -221,24 +220,103 @@ class _ProfilePage extends State<ProfilePage> {
             padding: const EdgeInsets.only(bottom: 5),
             child: InkWell(
               onTap: () {
-                AuthenticationService().signOut();
-                Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                        builder: (context) => const AuthenticationGate()),
-                    (route) => false);
+                //   Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => widget.user.isCleaner
+                //         ? CustomerAppointmentsPage(user: widget.user)
+                //         : CleanerAppointmentsPage(user: widget.user)
+                //   ),
+                // );
               },
-              child: const Card(
+              child: Card(
                 elevation: 5,
                 shadowColor: Colors.black12,
                 surfaceTintColor: Colors.transparent,
                 child: ListTile(
-                  leading: Icon(CupertinoIcons.arrow_right_arrow_left),
-                  title: Text("Logout"),
-                  trailing: Icon(Icons.chevron_right),
+                  leading: const Icon(Icons.bathroom),
+                  title: Text("# Bathrooms: ${widget.user.amountOfBathrooms}"),
+                  trailing: const Icon(Icons.chevron_right),
                 ),
               ),
             ),
           ),
+           Padding(
+            padding: const EdgeInsets.only(bottom: 5),
+            child: InkWell(
+              onTap: () {
+                //   Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => widget.user.isCleaner
+                //         ? CustomerAppointmentsPage(user: widget.user)
+                //         : CleanerAppointmentsPage(user: widget.user)
+                //   ),
+                // );
+              },
+              child: Card(
+                elevation: 5,
+                shadowColor: Colors.black12,
+                surfaceTintColor: Colors.transparent,
+                child: ListTile(
+                  leading: const Icon(Icons.house_siding),
+                  title: Text("Amount of floors: ${widget.user.storiesCount}"),
+                  trailing: const Icon(Icons.chevron_right),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 5),
+            child: InkWell(
+              onTap: () {
+                //   Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => widget.user.isCleaner
+                //         ? CustomerAppointmentsPage(user: widget.user)
+                //         : CleanerAppointmentsPage(user: widget.user)
+                //   ),
+                // );
+              },
+              child: Card(
+                elevation: 5,
+                shadowColor: Colors.black12,
+                surfaceTintColor: Colors.transparent,
+                child: ListTile(
+                  leading: const Icon(Icons.landscape),
+                  title: Text("Size of home: ${widget.user.sqftOfHome} sqft"),
+                  trailing: const Icon(Icons.chevron_right),
+                ),
+              ),
+            ),
+          ),
+           Padding(
+            padding: const EdgeInsets.only(bottom: 5),
+            child: InkWell(
+              onTap: () {
+                //   Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => widget.user.isCleaner
+                //         ? CustomerAppointmentsPage(user: widget.user)
+                //         : CleanerAppointmentsPage(user: widget.user)
+                //   ),
+                // );
+              },
+              child: Card(
+                elevation: 5,
+                shadowColor: Colors.black12,
+                surfaceTintColor: Colors.transparent,
+                child: ListTile(
+                  leading: const Icon(CupertinoIcons.house_fill),
+                  title: Text("House type: ${widget.user.houseType}"),
+                  trailing: const Icon(Icons.chevron_right),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 35),
         ],
       ),
       bottomNavigationBar: MyGnavBar(currentPageIndex: 2, user: widget.user),

@@ -35,18 +35,25 @@ class CleanerCard extends StatelessWidget {
           child: Stack(
             children: [
               ListTile(
-                leading: const CircleAvatar(
-                  backgroundColor: Colors.black54,
-                  child: Icon(
-                    Icons.person,
-                    color: Colors.white,
+                leading: cleaner.profilePhoto == 'none' ? 
+                  const CircleAvatar(
+                    backgroundColor: Colors.grey,
+                    radius: 40,
+                    child: Icon(
+                      Icons.person,
+                      color: Colors.white,
+                      size: 40,
+                    ),
+                  ) : 
+                  CircleAvatar(
+                    radius: 40,
+                    backgroundImage: NetworkImage(cleaner.profilePhoto),
                   ),
-                ),
                 title: Text(
                   '$name $lastInitial.',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Colors.blue[700],
+                    color: Colors.black,
                     fontSize: 18,
                   ),
                 ),
@@ -60,7 +67,7 @@ class CleanerCard extends StatelessWidget {
                 right: 5,
                 bottom: 0,
                 child: TextButton(
-                  child: const Text('Book', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),),
+                  child: const Text('Book', style: TextStyle(fontSize: 16, color: Colors.black),),
                   onPressed: () {
                     Navigator.push(
                       context,

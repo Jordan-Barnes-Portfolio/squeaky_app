@@ -41,16 +41,20 @@ class _CustomerMainPage extends State<CustomerMainPage> {
       backgroundColor: Colors.grey[200],
       bottomNavigationBar: MyGnavBar(
           currentPageIndex: widget.currentPageIndex, user: widget.user),
-      body: 
-      RefreshIndicator(
-          onRefresh: _refreshData,
-          color: Colors.black,
-          child: SafeArea(
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(3, 8, 3, 3),
-          child: _buildCleanerList(),
+      body: RefreshIndicator(
+        onRefresh: _refreshData,
+        color: Colors.black,
+        child: SafeArea(
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const SizedBox(height: 10),
+            Container(alignment: Alignment.center,
+            child: _buildCurrentAppointment()),
+            const SizedBox(height: 10),
+            const Divider(),
+            _buildCleanerList(),
+          ]),
         ),
-      ),
       ),
     );
   }
@@ -63,7 +67,8 @@ class _CustomerMainPage extends State<CustomerMainPage> {
           return const Center(child: CircularProgressIndicator());
         }
         final documents = snapshot.data!.docs;
-        return ListView.builder(
+        return Expanded(
+            child: ListView.builder(
           itemCount: documents.length,
           itemBuilder: (context, index) {
             final document = documents[index];
@@ -76,8 +81,30 @@ class _CustomerMainPage extends State<CustomerMainPage> {
               user: widget.user,
             );
           },
-        );
+        ));
       },
+    );
+  }
+
+  Widget _buildCurrentAppointment() {
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          'Current Appointments',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        SizedBox(height: 10),
+        Text(
+          'You have no upcoming appointments',
+          style: TextStyle(
+            fontSize: 16,
+          ),
+        ),
+      ],
     );
   }
 }

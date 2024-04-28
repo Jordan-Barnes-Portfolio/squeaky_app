@@ -32,6 +32,13 @@ class _CleanerMessagesPage extends State<CleanerMessagesPage> {
   }
 
   @override
+  initState(){
+    super.initState();
+    widget.getData();
+    ChatService().updateChatRoomTimes(widget.user.email);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: MyAppBar(user: widget.user),
@@ -79,6 +86,7 @@ class _CleanerMessagesPage extends State<CleanerMessagesPage> {
                     name: data['customerFirstName'],
                     lastMessage: data['lastMessage'],
                     time: data['formattedTime'],
+                    recieverEmail: data['userEmails']['customer']
                   );
                 },
               );
