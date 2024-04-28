@@ -254,11 +254,23 @@ class CustomerRegistrationPage extends StatelessWidget {
               obscureText: false,
               label: "Last Name",
             ),
+            MyNumberField(
+              controller: phoneController,
+              hintText: 'Your preferred contact phone number',
+              obscureText: false,
+              label: "Phone",
+            ),
             MyTextField(
               controller: addressController,
               hintText: 'Address line 1',
               obscureText: false,
               label: "Address Line 1",
+            ),
+             MyTextField(
+              controller: address2Controller,
+              hintText: 'Address line 2 (optional)',
+              obscureText: false,
+              label: "Address Line 2",
             ),
             Row(
               children: [
@@ -339,18 +351,6 @@ class CustomerRegistrationPage extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
-            MyTextField(
-              controller: address2Controller,
-              hintText: 'Address line 2 (optional)',
-              obscureText: false,
-              label: "Address Line 2",
-            ),
-            MyNumberField(
-              controller: phoneController,
-              hintText: 'Your preferred contact phone number',
-              obscureText: false,
-              label: "Phone",
             ),
             MyButton(
                 text: "Next",

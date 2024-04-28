@@ -229,6 +229,12 @@ class CleanerRegistrationPage extends StatelessWidget {
               obscureText: false,
               label: "Address Line 1",
             ),
+             MyTextField(
+              controller: address2Controller,
+              hintText: 'Address line 2 (optional)',
+              obscureText: false,
+              label: "Address Line 2",
+            ),
             Row(
               children: [
                 Expanded(
@@ -308,12 +314,6 @@ class CleanerRegistrationPage extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
-            MyTextField(
-              controller: address2Controller,
-              hintText: 'Address line 2 (optional)',
-              obscureText: false,
-              label: "Address Line 2",
             ),
             MyButton(
                 text: "Next",
