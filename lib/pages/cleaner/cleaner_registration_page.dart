@@ -24,6 +24,8 @@ class CleanerRegistrationPage extends StatelessWidget {
     final zipCodeController = TextEditingController();
     final cityController = TextEditingController();
     final stateController = TextEditingController();
+    final firstnameController = TextEditingController();
+    final lastnameController = TextEditingController();
 
     bool isEmail(String em) {
       String p =
@@ -96,6 +98,27 @@ class CleanerRegistrationPage extends StatelessWidget {
         return;
       }
 
+      if (firstnameController.text.length > 12) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Error'),
+            content: const Text(
+                'Sorry, your first name is longer than 12 characters.. can you shorten it?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context, rootNavigator: true)
+                      .pop(); // dismisses only the dialog and returns nothing
+                },
+                child: const Text('Ok'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+
       if (passwordController.text.isEmpty ||
           addressController.text.isEmpty ||
           confirmPasswordController.text.isEmpty ||
@@ -103,7 +126,9 @@ class CleanerRegistrationPage extends StatelessWidget {
           phoneController.text.isEmpty ||
           cityController.text.isEmpty ||
           stateController.text.isEmpty ||
-          zipCodeController.text.isEmpty) {
+          zipCodeController.text.isEmpty ||
+          firstnameController.text.isEmpty ||
+          lastnameController.text.isEmpty) {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -128,6 +153,8 @@ class CleanerRegistrationPage extends StatelessWidget {
         email: emailController.text,
         password: passwordController.text,
         phoneNumber: phoneController.text,
+        firstName: firstnameController.text,
+        lastName: lastnameController.text,
         address:
             "${addressController.text} ${address2Controller.text} ${cityController.text}, ${stateController.text} ${zipCodeController.text}",
         isAdmin: false,
@@ -198,6 +225,18 @@ class CleanerRegistrationPage extends StatelessWidget {
                   )
                 ],
               ),
+            ),
+            MyTextField(
+              controller: firstnameController,
+              hintText: 'First Name',
+              obscureText: false,
+              label: "First Name",
+            ),
+            MyTextField(
+              controller: lastnameController,
+              hintText: 'Last Name',
+              obscureText: false,
+              label: "Last Name",
             ),
             MyTextField(
               controller: emailController,

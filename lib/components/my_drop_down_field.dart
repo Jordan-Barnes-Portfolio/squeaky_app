@@ -21,6 +21,7 @@ class MyDropDownField extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 15, right: 15, top: 5, bottom: 15),
       child: DropdownButtonFormField<String>(
+        menuMaxHeight: 300,
         onChanged: (value) => controller.text = value!,
         items: options.map((String option) {
           return DropdownMenuItem<String>(

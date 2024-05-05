@@ -85,6 +85,7 @@ class _CustomerRegistrationPage3State extends State<CustomerRegistrationPage3> {
       return;
     }
 
+    user.uuid = UniqueKey().toString();
     user.firstName = user.firstName[0].toUpperCase() +
         user.firstName.substring(1); // Capitalize the first letter
 

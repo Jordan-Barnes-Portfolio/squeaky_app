@@ -90,9 +90,12 @@ class AppStartupPage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => const LoginPage()),
                 );
               },
-              child: const Text(
-                "Already have an account?",
-                style: TextStyle(fontSize: 15, color: Colors.black),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Already a member? Tap here to '),
+                  Text('login', style: TextStyle(color: Colors.blue[500])),
+                ],
               ),
             ),
           ],

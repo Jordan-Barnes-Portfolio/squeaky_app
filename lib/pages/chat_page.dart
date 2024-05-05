@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -10,12 +12,14 @@ class ChatPage extends StatefulWidget {
   final String recieverUserEmail;
   final String receiverFirstName;
   final AppUser user;
+  final String initialMessage;
 
-  const ChatPage(
+  ChatPage(
       {super.key,
       required this.receiverFirstName,
       required this.recieverUserEmail,
-      required this.user});
+      required this.user,
+      required this.initialMessage});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -29,9 +33,16 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
+
+    if (widget.initialMessage.isNotEmpty) {
+      _chatService.sendMessage(
+          widget.recieverUserEmail, widget.initialMessage, widget.user);
+    }
+
     SchedulerBinding.instance.addPostFrameCallback((_) {
       if (_controller.hasClients) {
-        _controller.animateTo(0.0, duration: const Duration(milliseconds: 500), curve: Curves.easeOut);
+        _controller.animateTo(0.0,
+            duration: const Duration(milliseconds: 500), curve: Curves.easeOut);
       }
     });
   }
@@ -73,11 +84,12 @@ class _ChatPageState extends State<ChatPage> {
                   }
 
                   return ListView(
-                     reverse: true,
-                      
+                      reverse: true,
                       children: snapshot.data!.docs
                           .map((document) => _buildMessageItem(document))
-                          .toList().reversed.toList());
+                          .toList()
+                          .reversed
+                          .toList());
                 },
               ),
             ),

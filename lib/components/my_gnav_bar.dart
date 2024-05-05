@@ -3,8 +3,8 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:squeaky_app/objects/user.dart';
 import 'package:squeaky_app/pages/cleaner/cleaner_main_page.dart';
 import 'package:squeaky_app/pages/customer/customer_main_page.dart';
-import 'package:squeaky_app/pages/cleaner/messages_cleaner.dart';
-import 'package:squeaky_app/pages/customer/messages_customer.dart';
+import 'package:squeaky_app/pages/cleaner/cleaner_messages_page.dart';
+import 'package:squeaky_app/pages/customer/customer_messages_page.dart';
 import 'package:squeaky_app/pages/profile_page.dart';
 
 class MyGnavBar extends StatelessWidget {

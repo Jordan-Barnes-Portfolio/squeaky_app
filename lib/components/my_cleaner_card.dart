@@ -2,7 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/chat_page.dart';
+import 'package:squeaky_app/pages/cleaner/cleaner_viewable_profile_page.dart';
+import 'package:squeaky_app/pages/customer/customer_booking_page.dart';
 
 class CleanerCard extends StatelessWidget {
   final AppUser cleaner;
@@ -20,7 +21,18 @@ class CleanerCard extends StatelessWidget {
     String lastInitial = cleaner.lastName[0];
 
     return GestureDetector(
-      onTap: null,
+      onTap: () => {
+        showModalBottomSheet(
+            barrierColor: Color(const Color.fromARGB(113, 238, 238, 238).value),
+            isScrollControlled: true,
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.85,
+            ),
+            context: context,
+            builder: (BuildContext context) {
+              return CleanerDetailsPage(cleaner: cleaner, user: user);
+            }),
+      },
       child: SizedBox(
         width: double.infinity, // Set the desired width
         height: 150, // Set the desired height
@@ -35,20 +47,20 @@ class CleanerCard extends StatelessWidget {
           child: Stack(
             children: [
               ListTile(
-                leading: cleaner.profilePhoto == 'none' ? 
-                  const CircleAvatar(
-                    backgroundColor: Colors.grey,
-                    radius: 40,
-                    child: Icon(
-                      Icons.person,
-                      color: Colors.white,
-                      size: 40,
-                    ),
-                  ) : 
-                  CircleAvatar(
-                    radius: 40,
-                    backgroundImage: NetworkImage(cleaner.profilePhoto),
-                  ),
+                leading: cleaner.profilePhoto == 'none'
+                    ? const CircleAvatar(
+                        backgroundColor: Colors.grey,
+                        radius: 40,
+                        child: Icon(
+                          Icons.person,
+                          color: Colors.white,
+                          size: 40,
+                        ),
+                      )
+                    : CircleAvatar(
+                        radius: 40,
+                        backgroundImage: NetworkImage(cleaner.profilePhoto),
+                      ),
                 title: Text(
                   '$name $lastInitial.',
                   style: const TextStyle(
@@ -67,15 +79,17 @@ class CleanerCard extends StatelessWidget {
                 right: 5,
                 bottom: 0,
                 child: TextButton(
-                  child: const Text('Book', style: TextStyle(fontSize: 16, color: Colors.black),),
+                  child: const Text(
+                    'Book',
+                    style: TextStyle(fontSize: 16, color: Colors.black),
+                  ),
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ChatPage(
+                        builder: (context) => CustomerBookingPage(
                           user: user,
-                          receiverFirstName: cleaner.firstName,
-                          recieverUserEmail: cleaner.email,
+                          cleaner: cleaner,
                         ),
                       ),
                     );

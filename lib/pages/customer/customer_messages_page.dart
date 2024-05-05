@@ -80,6 +80,7 @@ class _CustomerMessagesPage extends State<CustomerMessagesPage> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => ChatPage(
+                                initialMessage: '',
                                   receiverFirstName: data['cleanerFirstName'],
                                   recieverUserEmail: data['userEmails']
                                       ['cleaner'],

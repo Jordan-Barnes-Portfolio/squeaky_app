@@ -63,6 +63,7 @@ flutter:
   assets:
     - lib/assets/apple.png
     - lib/assets/google.png
+    - lib/assets/defaultHero.jpg
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

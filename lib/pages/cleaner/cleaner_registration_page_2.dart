@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:squeaky_app/components/my_button.dart';
 import 'package:squeaky_app/components/my_large_text_field.dart';
-import 'package:squeaky_app/components/my_text_field.dart';
 import 'package:squeaky_app/objects/user.dart';
 
 // ignore: must_be_immutable
@@ -16,17 +15,15 @@ class CleanerRegistrationPage2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //Controllers
-    final firstnameController = TextEditingController();
-    final lastnameController = TextEditingController();
     final pphController = TextEditingController();
     final bioController = TextEditingController();
+    final skillsController = TextEditingController();
 
     //Functions
     void handleNextSubmit() async {
       if (pphController.text.isEmpty ||
           bioController.text.isEmpty ||
-          firstnameController.text.isEmpty ||
-          lastnameController.text.isEmpty) {
+          skillsController.text.isEmpty) {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -47,31 +44,10 @@ class CleanerRegistrationPage2 extends StatelessWidget {
         return;
       }
 
-      if (firstnameController.text.length > 12) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Error'),
-            content: const Text(
-                'Sorry, your first name is longer than 12 characters.. can you shorten it?'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context, rootNavigator: true)
-                      .pop(); // dismisses only the dialog and returns nothing
-                },
-                child: const Text('Ok'),
-              ),
-            ],
-          ),
-        );
-        return;
-      }
-
       user.pricing = pphController.text;
       user.bio = bioController.text;
-      user.firstName = firstnameController.text;
-      user.lastName = lastnameController.text;
+      user.skills = skillsController.text;
+      user.uuid = UniqueKey().toString();
 
       user.firstName = user.firstName[0].toUpperCase() +
           user.firstName.substring(1); // Capitalize the first letter
@@ -125,11 +101,11 @@ class CleanerRegistrationPage2 extends StatelessWidget {
     }
 
     return Scaffold(
-        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.grey[200],
-        body: SafeArea(
-            child: Center(
-                child: Column(
+        body: SingleChildScrollView(
+            child: SafeArea(
+                child: Center(
+                    child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 25),
@@ -157,18 +133,6 @@ class CleanerRegistrationPage2 extends StatelessWidget {
                 ],
               ),
             ),
-            MyTextField(
-              controller: firstnameController,
-              hintText: 'First Name',
-              obscureText: false,
-              label: "First Name",
-            ),
-            MyTextField(
-              controller: lastnameController,
-              hintText: 'Last Name',
-              obscureText: false,
-              label: "Last Name",
-            ),
             Padding(
               padding: const EdgeInsets.only(
                   left: 15, right: 15, top: 5, bottom: 15),
@@ -186,12 +150,20 @@ class CleanerRegistrationPage2 extends StatelessWidget {
                 ),
               ),
             ),
-            const Text("Write about your cleaning experience!",
+            const Text("Write a little about yourself!",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             MyLargeTextField(
               controller: bioController,
               hintText:
-                  "I've been cleaning for 5 years... I'm extremely detail oriented and love to make homes sparkle!",
+                  "I'm detail oriented, I love to walk my doggy, and I play video games!",
+              obscureText: false,
+            ),
+            const Text("Tell us your experience and skills!",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            MyLargeTextField(
+              controller: skillsController,
+              hintText:
+                  "I've been cleaning for 5 years with various reputable cleaning companies, I'm extremely detail oriented, and love to make homes sparkle!",
               obscureText: false,
             ),
             MyButton(
@@ -205,6 +177,6 @@ class CleanerRegistrationPage2 extends StatelessWidget {
                   onTap: () => Navigator.pop(context))
             ])
           ],
-        ))));
+        )))));
   }
 }

@@ -11,6 +11,8 @@ import 'package:squeaky_app/components/my_gnav_bar.dart';
 import 'package:squeaky_app/objects/user.dart';
 import 'package:squeaky_app/pages/cleaner/cleaner_account_details_page.dart';
 import 'package:squeaky_app/pages/customer/customer_account_details_page.dart';
+import 'package:squeaky_app/pages/legal_page.dart';
+import 'package:squeaky_app/pages/support_page.dart';
 import 'package:squeaky_app/services/authentication_gate.dart';
 import 'package:squeaky_app/services/authentication_service.dart';
 import 'package:squeaky_app/util/utils.dart';
@@ -34,7 +36,8 @@ class _ProfilePage extends State<ProfilePage> {
           .collection('users')
           .where('email', isEqualTo: widget.user.email)
           .get();
-      Reference ref = storage.ref().child("images/${widget.user.hashCode}");
+      Reference ref =
+          storage.ref().child("images/${widget.user.uuid.replaceAll('-', '')}");
       UploadTask uploadTask = ref.putFile(imageFile);
       await uploadTask.whenComplete(() async {
         var url = await ref.getDownloadURL();
@@ -148,13 +151,12 @@ class _ProfilePage extends State<ProfilePage> {
             padding: const EdgeInsets.only(bottom: 5),
             child: InkWell(
               onTap: () {
-                  Navigator.push(
+                Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => widget.user.isCleaner
-                        ? CleanerAccountDetailsPage(user: widget.user)
-                        : CustomerAccountDetailsPage(user: widget.user)
-                  ),
+                      builder: (context) => widget.user.isCleaner
+                          ? CleanerAccountDetailsPage(user: widget.user)
+                          : CustomerAccountDetailsPage(user: widget.user)),
                 );
               },
               child: const Card(
@@ -198,12 +200,33 @@ class _ProfilePage extends State<ProfilePage> {
             padding: const EdgeInsets.only(bottom: 5),
             child: InkWell(
               onTap: () {
-                //   Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => LegalPage(user: widget.user)
-                //   ),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => SupportPage(user: widget.user)),
+                );
+              },
+              child: const Card(
+                elevation: 5,
+                shadowColor: Colors.black12,
+                surfaceTintColor: Colors.transparent,
+                child: ListTile(
+                  leading: Icon(CupertinoIcons.question_circle),
+                  title: Text("Support"),
+                  trailing: Icon(Icons.chevron_right),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 5),
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => LegalPage(user: widget.user)),
+                );
               },
               child: const Card(
                 elevation: 5,

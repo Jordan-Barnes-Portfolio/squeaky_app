@@ -47,11 +47,17 @@ class _CustomerMainPage extends State<CustomerMainPage> {
         child: SafeArea(
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             Container(
                 alignment: Alignment.center, child: _buildCurrentAppointment()),
+            const SizedBox(height: 20),
+            const Divider(
+              thickness: 1,
+              color: Colors.black,
+            ),
             const SizedBox(height: 10),
-            const Divider(),
+            Text('Tap any cleaner to view their profile..',
+                style: TextStyle(fontSize: 12, color: Colors.grey[600])),
             _buildCleanerList(),
           ]),
         ),
@@ -72,7 +78,8 @@ class _CustomerMainPage extends State<CustomerMainPage> {
           itemCount: documents.length,
           itemBuilder: (context, index) {
             if (documents.length <= 1) {
-              return const Center(child: Text('No cleaners available in your area.. yet.'));
+              return const Center(
+                  child: Text('No cleaners available in your area.. yet.'));
             } else {
               print(documents);
               final document = documents[index];

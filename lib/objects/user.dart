@@ -1,5 +1,4 @@
 // ignore_for_file: unnecessary_getters_setters
-
 class AppUser {
 
   //Every account has these parameters
@@ -9,6 +8,7 @@ class AppUser {
   String _lastName;
   String _phoneNumber;
   String _address;
+  String _uuid;
 
   //These are dependent 
   String _bio;
@@ -22,6 +22,8 @@ class AppUser {
   String _floorType;
   String _storiesCount;
   String _profilePhoto;
+  String _skills;
+  String _heroPhoto;
 
   //These are for account type
   bool _isCleaner;
@@ -35,6 +37,7 @@ class AppUser {
     String lastName = "none",
     String phoneNumber = "none",
     String address = "none",
+    String uuid = "",
 
     //Default and optional parameters
     String bio = "none",
@@ -48,6 +51,8 @@ class AppUser {
     String storiesCount = "0",
     String floorType = "none",
     String profilePhoto = "none",
+    String heroPhoto = "none",
+    String skills = "none",
     bool isAdmin = false,
     bool isCleaner = false,
     bool isCustomer = false,
@@ -72,9 +77,21 @@ class AppUser {
         _floorType = floorType,
         _storiesCount = storiesCount,
         _profilePhoto = profilePhoto,
+        _skills = skills,
+        _heroPhoto = heroPhoto,
+        _uuid = uuid,
         _houseType = houseType;
 
   //Getters and setters
+  String get uuid => _uuid;
+  set uuid(String value) => _uuid = value;
+
+  String get skills => _skills;
+  set skills(String value) => _skills = value;
+
+  String get heroPhoto => _heroPhoto;
+  set heroPhoto(String value) => _heroPhoto = value;
+
   String get profilePhoto => _profilePhoto;
   set profilePhoto(String value) => _profilePhoto = value;
 
@@ -153,6 +170,9 @@ class AppUser {
       'storiesCount': _storiesCount,
       'floorType': _floorType,
       'profilePhoto': _profilePhoto,
+      'skills': _skills,
+      'uuid': _uuid, 
+      'heroPhoto': _heroPhoto,
     };
   }
 
@@ -177,6 +197,9 @@ class AppUser {
       rating: map['rating'] as String,
       ratings: map['ratings'] as String,
       profilePhoto: map['profilePhoto'] as String,
+      skills: map['skills'] as String,
+      heroPhoto: map['heroPhoto'] as String,
+      uuid: map['uuid'] as String,
     );
   }
 }
