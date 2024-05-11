@@ -459,7 +459,7 @@ class _CleanerAccountDetailsPage extends State<CleanerAccountDetailsPage> {
                 color: Colors.blue[300]!,
                 onPressed: () {
                   if (pphController.text.isNotEmpty) {
-                    widget.user.pricing = pphController.text;
+                    widget.user.pricing = double.parse(pphController.text);
                   }
                   final userRef = FirebaseFirestore.instance
                       .collection('users')

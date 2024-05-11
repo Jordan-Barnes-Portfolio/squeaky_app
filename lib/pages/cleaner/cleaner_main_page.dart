@@ -1,9 +1,12 @@
 // ignore_for_file: unused_local_variable, must_be_immutable, library_private_types_in_public_api
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:squeaky_app/components/cleaner_appointment_card.dart';
 import 'package:squeaky_app/components/my_appbar.dart';
 import 'package:squeaky_app/components/my_gnav_bar.dart';
+import 'package:squeaky_app/objects/appointment.dart';
 import 'package:squeaky_app/objects/user.dart';
+import 'package:squeaky_app/services/appointment_service.dart';
 
 class CleanerMainPage extends StatefulWidget {
   final AppUser user; // AppUser object
@@ -13,11 +16,11 @@ class CleanerMainPage extends StatefulWidget {
   @override
   _CleanerMainPage createState() => _CleanerMainPage();
 
-  final _fireStore = FirebaseFirestore.instance;
-  final ref = FirebaseFirestore.instance.collection('users').snapshots();
   Future<void> getData() async {
-    QuerySnapshot querySnapshot = await _fireStore.collection('users').get();
-    final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+    final todaysAppointments =
+        AppointmentService().getTodaysAppointments(user.email);
+    final upcomingAppointments =
+        AppointmentService().getUpcomingAppointments(user.email);
   }
 }
 
@@ -34,33 +37,123 @@ class _CleanerMainPage extends State<CleanerMainPage> {
       backgroundColor: Colors.grey[200],
       bottomNavigationBar: MyGnavBar(
           currentPageIndex: widget.currentPageIndex, user: widget.user),
-      body: const SafeArea(
-        child: Center(
+      body: SafeArea(
+        child: DefaultTabController(
+          length: 2,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(
-                height: 20,
+              TabBar(
+                dividerColor: Color(Colors.black.value),
+                labelColor: Colors.black,
+                unselectedLabelColor: Colors.grey,
+                indicatorColor: Colors.black,
+                indicatorSize: TabBarIndicatorSize.tab,
+                tabs: const [
+                  Tab(text: 'Today\'s Appointments'),
+                  Tab(text: 'Upcoming Appointments'),
+                ],
               ),
-              Text(
-                'Current Appointments',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+              const SizedBox(height: 20),
+              SingleChildScrollView(
+                child: SizedBox(
+                  height: 500,
+                  width: MediaQuery.of(context).size.width,
+                  child: TabBarView(
+                    children: [
+                      _buildCurrentAppointmentList(),
+                      _buildFutureAppointmentList(),
+                    ],
+                  ),
                 ),
-              ),
-              SizedBox(height: 10),
-              Text(
-                'You have no upcoming appointments',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                ),
-              ),
+              )
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildCurrentAppointmentList() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: AppointmentService().getTodaysAppointments(widget.user.email),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final documents = snapshot.data!.docs;
+        if (documents.isEmpty) {
+          return const Center(
+              child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Text('No appointments today',
+                      style: TextStyle(fontSize: 16))));
+        }
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: documents.length,
+          itemBuilder: (context, index) {
+            var now = DateTime.now();
+            var yesterday =
+                DateTime(now.year, now.month, now.day - 1, 23, 59, 59);
+            final document = documents[index];
+            final data = document.data() as Map<String, dynamic>;
+            DateTime date = data['sortByDate'].toDate();
+
+            if (data['status'] == 'completed' || data['status'] == 'canceled') {
+              return const SizedBox.shrink();
+            } else if (date.isBefore(yesterday)) {
+              return CleanerAppointmentCard(
+                appointment: Appointment.fromMap(data),
+                user: widget.user,
+                pastDue: true,
+              );
+            } else {
+              var formattedDate = data['formattedDate'] as String;
+              formattedDate = formattedDate.split('at')[1];
+              data['formattedDate'] = 'Today at$formattedDate';
+              return CleanerAppointmentCard(
+                appointment: Appointment.fromMap(data),
+                user: widget.user,
+              );
+            }
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildFutureAppointmentList() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: AppointmentService().getUpcomingAppointments(widget.user.email),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final documents = snapshot.data!.docs;
+        if (documents.isEmpty) {
+          return const Center(
+              child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Text('No upcoming appointments',
+                      style: TextStyle(fontSize: 16))));
+        }
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: documents.length,
+          itemBuilder: (context, index) {
+            final document = documents[index];
+            final data = document.data() as Map<String, dynamic>;
+            if (data['status'] == 'completed' || data['status'] == 'canceled') {
+              return const SizedBox.shrink();
+            } else {
+              return CleanerAppointmentCard(
+                appointment: Appointment.fromMap(data),
+                user: widget.user,
+              );
+            }
+          },
+        );
+      },
     );
   }
 }

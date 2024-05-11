@@ -71,7 +71,7 @@ class _LoginPageState extends State<LoginPage>{
 
                           //welcome text
                           const Text(
-                            "Feelin Dirty?",
+                            "Neat Freak",
                             style: TextStyle(
                                 fontSize: 30, fontWeight: FontWeight.bold),
                           ),

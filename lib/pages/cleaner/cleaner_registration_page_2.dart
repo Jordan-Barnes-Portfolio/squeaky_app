@@ -44,7 +44,7 @@ class CleanerRegistrationPage2 extends StatelessWidget {
         return;
       }
 
-      user.pricing = pphController.text;
+      user.pricing = double.parse(pphController.text);
       user.bio = bioController.text;
       user.skills = skillsController.text;
       user.uuid = UniqueKey().toString();

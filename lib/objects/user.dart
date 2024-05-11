@@ -12,7 +12,7 @@ class AppUser {
 
   //These are dependent 
   String _bio;
-  String _pricing;
+  num _pricing;
   String _ratings;
   String _rating;
   String _amountOfBedrooms;
@@ -41,7 +41,7 @@ class AppUser {
 
     //Default and optional parameters
     String bio = "none",
-    String pricing = "none",
+    num pricing = 0,
     String ratings = "0",
     String rating = "0.0",
     String amountOfBedrooms = "0",
@@ -119,8 +119,8 @@ class AppUser {
   String get ratings => _ratings;
   set ratings(String value) => _ratings = value;
 
-  String get pricing => _pricing;
-  set pricing(String value) => _pricing = value;
+  num get pricing => _pricing;
+  set pricing(num value) => _pricing = value;
 
   String get email => _email;
   set email(String value) => _email = value;
@@ -185,7 +185,7 @@ class AppUser {
       phoneNumber: map['phoneNumber'] as String,
       address: map['address'] as String,
       bio: map['bio'] as String,
-      pricing: map['pricing'] as String,
+      pricing: map['pricing'] as num,
       storiesCount: map['storiesCount'] as String,
       floorType: map['floorType'] as String,
       amountOfBathrooms: map['amountOfBathrooms'] as String,

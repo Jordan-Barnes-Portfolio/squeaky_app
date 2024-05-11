@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:squeaky_app/components/messages_card.dart';
 import 'package:squeaky_app/components/my_appbar.dart';
 import 'package:squeaky_app/components/my_gnav_bar.dart';
+import 'package:squeaky_app/objects/appointment.dart';
 import 'package:squeaky_app/objects/user.dart';
 import 'package:squeaky_app/pages/chat_page.dart';
 import 'package:squeaky_app/services/chat_service.dart';
@@ -80,7 +81,9 @@ class _CustomerMessagesPage extends State<CustomerMessagesPage> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => ChatPage(
-                                initialMessage: '',
+                                  appointment:
+                                      Appointment(formattedDate: '', details: '', unformattedDate: '', status: 'scheduled', invoice: null, sortByDate: null),
+                                  initialMessage: '',
                                   receiverFirstName: data['cleanerFirstName'],
                                   recieverUserEmail: data['userEmails']
                                       ['cleaner'],

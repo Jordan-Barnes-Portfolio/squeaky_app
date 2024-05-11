@@ -12,6 +12,7 @@ import 'package:squeaky_app/objects/user.dart';
 import 'package:squeaky_app/pages/cleaner/cleaner_account_details_page.dart';
 import 'package:squeaky_app/pages/customer/customer_account_details_page.dart';
 import 'package:squeaky_app/pages/legal_page.dart';
+import 'package:squeaky_app/pages/past_appointments_page.dart';
 import 'package:squeaky_app/pages/support_page.dart';
 import 'package:squeaky_app/services/authentication_gate.dart';
 import 'package:squeaky_app/services/authentication_service.dart';
@@ -126,14 +127,12 @@ class _ProfilePage extends State<ProfilePage> {
             padding: const EdgeInsets.only(bottom: 5),
             child: InkWell(
               onTap: () {
-                //   Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => widget.user.isCleaner
-                //         ? CustomerAppointmentsPage(user: widget.user)
-                //         : CleanerAppointmentsPage(user: widget.user)
-                //   ),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PastAppointmentsPage(user: widget.user)
+                  ),
+                );
               },
               child: const Card(
                 elevation: 5,
@@ -178,7 +177,7 @@ class _ProfilePage extends State<ProfilePage> {
                 //   Navigator.push(
                 //   context,
                 //   MaterialPageRoute(
-                //     builder: (context) => PaymentDetailsPage(user: widget.user)
+                //     builder: (context) => PastAppointmentsPage(user: widget.user)
                 //   ),
                 // );
               },

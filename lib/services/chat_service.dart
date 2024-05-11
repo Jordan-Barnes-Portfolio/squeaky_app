@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:squeaky_app/objects/appointment.dart';
 import 'package:squeaky_app/objects/chat_room.dart';
 import 'package:squeaky_app/objects/message.dart';
 import 'package:squeaky_app/objects/user.dart';
@@ -11,8 +12,8 @@ class ChatService extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // SENDING A MESSAGE
-  Future<void> sendMessage(
-      String recieverEmail, String message, AppUser user) async {
+  Future<void> sendMessage(String recieverEmail, String message, AppUser user,
+      bool containsQuote, bool containsInvoice, bool systemMessage, Appointment ?appointment) async {
     //get current user info
     final String currentUserEmail = _firebaseAuth.currentUser!.email!;
     final DateTime timestamp = DateTime.now();
@@ -34,8 +35,14 @@ class ChatService extends ChangeNotifier {
     Message newMessage = Message(
       recieverEmail: recieverEmail,
       senderEmail: currentUserEmail,
+      cleanerEmail: usersList['cleaner']!,
+      customerEmail: usersList['customer']!,
       message: message,
       timestamp: timestamp,
+      containsQuote: containsQuote,
+      containsInvoice: containsInvoice,
+      systemMessage: systemMessage,
+      appointment: appointment,
     );
 
     //construct chat room id from current user id and receiver id (sorted to avoid duplicates)
@@ -53,27 +60,28 @@ class ChatService extends ChangeNotifier {
     //add chat room to database
     var chats = _firestore.collection('chats').doc(chatRoomId);
     var chatRoom = await chats.get();
+    QuerySnapshot snapshot = await _firestore.collection('users').get();
+
+    var customer = snapshot.docs
+        .firstWhere((element) => element.id == usersList['customer']);
+    var cleaner = snapshot.docs
+        .firstWhere((element) => element.id == usersList['cleaner']);
+
     if (!chatRoom.exists) {
-      QuerySnapshot snapshot = await _firestore.collection('users').get();
-
-      var customer = snapshot.docs
-          .firstWhere((element) => element.id == usersList['customer']);
-      var cleaner = snapshot.docs
-          .firstWhere((element) => element.id == usersList['cleaner']);
-
       Chat newChat = Chat(
         userEmails: usersList,
         users: [user.email, recieverEmail],
         customerFirstName: customer['firstName'],
         cleanerFirstName: cleaner['firstName'],
         lastMessage: message,
-        formattedTime:readTimestamp(timestamp.millisecondsSinceEpoch),
+        formattedTime: readTimestamp(timestamp.millisecondsSinceEpoch),
         unformattedTime: Timestamp.now(),
       );
       await chats.set(newChat.toMap());
     } else {
       var time = readTimestamp(timestamp.millisecondsSinceEpoch);
-      updateChatRoom(chatRoom, message, time);
+      updateChatRoom(
+          chatRoom, message, time, customer['firstName'], cleaner['firstName']);
     }
   }
 
@@ -99,9 +107,15 @@ class ChatService extends ChangeNotifier {
         .snapshots();
   }
 
-  void updateChatRoom(DocumentSnapshot<Map<String, dynamic>> chatRoom,
-      String message, String timestamp) {
+  void updateChatRoom(
+      DocumentSnapshot<Map<String, dynamic>> chatRoom,
+      String message,
+      String timestamp,
+      String customerFirstName,
+      String cleanerFirstName) {
     chatRoom.reference.update({
+      'customerFirstName': customerFirstName,
+      'cleanerFirstName': cleanerFirstName,
       'lastMessage': message,
       'formattedTime': timestamp.toString(),
       'unformattedTime': Timestamp.now(),
@@ -115,10 +129,11 @@ class ChatService extends ChangeNotifier {
     var yesterday = DateTime(now.year, now.month, now.day - 1);
     var twoDaysAgo = DateTime(now.year, now.month, now.day - 2);
 
-    if(date.day == now.day && date.month == now.month && date.year == now.year){
+    if (date.day == now.day &&
+        date.month == now.month &&
+        date.year == now.year) {
       return format.format(date);
-    }
-    else if (date.isAfter(yesterday)) {
+    } else if (date.isAfter(yesterday)) {
       return 'Yesterday';
     } else if (date.isAfter(twoDaysAgo)) {
       return DateFormat('EEEE, dd MMMM').format(date);
@@ -127,7 +142,6 @@ class ChatService extends ChangeNotifier {
     } else {
       return DateFormat('EEEE, dd MMMM').format(date);
     }
-
   }
 
   Future<void> updateChatRoomTimes(String userId) async {
@@ -135,7 +149,8 @@ class ChatService extends ChangeNotifier {
     for (var element in snapshot.docs) {
       if (element['users'].contains(userId)) {
         element.reference.update({
-          'formattedTime': readTimestamp(element['unformattedTime'].millisecondsSinceEpoch),
+          'formattedTime':
+              readTimestamp(element['unformattedTime'].millisecondsSinceEpoch),
         });
       }
     }

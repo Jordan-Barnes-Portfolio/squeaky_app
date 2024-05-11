@@ -46,7 +46,7 @@ class AppStartupPage extends StatelessWidget {
               padding: EdgeInsets.all(32.0),
               child: Text(
                 "Select one to get started",
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
               ),
             ),
 

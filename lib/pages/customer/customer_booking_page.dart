@@ -1,11 +1,13 @@
 // ignore_for_file: must_be_immutable, library_private_types_in_public_api
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:squeaky_app/components/my_button.dart';
 import 'package:squeaky_app/components/my_gnav_bar.dart';
 import 'package:squeaky_app/components/my_large_text_field.dart';
+import 'package:squeaky_app/objects/appointment.dart';
 import 'package:squeaky_app/objects/user.dart';
 import 'package:squeaky_app/pages/chat_page.dart';
 
@@ -22,8 +24,9 @@ class CustomerBookingPage extends StatefulWidget {
 }
 
 class _CustomerBookingPage extends State<CustomerBookingPage> {
-  TextEditingController appointmentController = TextEditingController();
   TextEditingController detailsController = TextEditingController();
+  TextEditingController appointmentTimeController = TextEditingController();
+  TextEditingController appointmentController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +54,7 @@ class _CustomerBookingPage extends State<CustomerBookingPage> {
           children: [
             const SizedBox(height: 25),
             SizedBox(
-              height: 200,
+              height: 150,
               width: 300,
               child: CupertinoDatePicker(
                   initialDateTime: date,
@@ -61,6 +64,7 @@ class _CustomerBookingPage extends State<CustomerBookingPage> {
                     setState(() {
                       appointmentController.text =
                           '${DateFormat('EEEE, MMMM dd').format(newDateTime)} at ${DateFormat('hh:mm a').format(newDateTime)}';
+                      appointmentTimeController.text = newDateTime.toString();
                     });
                   },
                   mode: CupertinoDatePickerMode.dateAndTime,
@@ -74,6 +78,21 @@ class _CustomerBookingPage extends State<CustomerBookingPage> {
                 readOnly: true,
                 decoration: const InputDecoration(
                   labelText: 'Appointment Date and Time',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+            Padding(
+                padding: const EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0),
+                child: Text('Make this appointment recurring.',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]))),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(22, 8, 22, 8),
+              child: TextField(
+                controller: appointmentController,
+                readOnly: true,
+                decoration: const InputDecoration(
+                  labelText: 'Recurring selection (coming soon)',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -93,13 +112,46 @@ class _CustomerBookingPage extends State<CustomerBookingPage> {
                     text: 'Continue booking',
                     color: Colors.blue[300]!,
                     onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => ChatPage(
-                            user: widget.user,
-                            recieverUserEmail: widget.cleaner.email,
-                            receiverFirstName: widget.cleaner.firstName,
-                            initialMessage: 'I would like to book a cleaning appointment with you. Date: ${appointmentController.text}. Here are some additional details: ${detailsController.text}',
-                          )));
+                      if (appointmentController.text.isEmpty) {
+                        return showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              shadowColor: Colors.transparent,
+                              backgroundColor: Colors.grey[200],
+                              title: const Text('Error'),
+                              content: const Text(
+                                  'Please select an appointment date and time.'),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('OK'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                      Appointment appointment = Appointment(
+                          formattedDate: appointmentController.text,
+                          details: detailsController.text,
+                          unformattedDate: appointmentTimeController.text,
+                          sortByDate: Timestamp.fromDate(
+                              DateTime.parse(appointmentTimeController.text)),
+                          invoice: null,
+                          status: 'scheduled');
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ChatPage(
+                                  user: widget.user,
+                                  recieverUserEmail: widget.cleaner.email,
+                                  receiverFirstName: widget.cleaner.firstName,
+                                  initialMessage:
+                                      'I would like to book a cleaning appointment with you. \nDate: ${appointmentController.text}. \nDetails: ${detailsController.text}\nHome Info: \n  - Home Type: ${widget.user.houseType}\n  - Floor type: ${widget.user.floorType}\n  - Number of bedrooms: ${widget.user.amountOfBedrooms}\n  - Number of bathrooms: ${widget.user.amountOfBathrooms}\n  - House Size: ${widget.user.sqftOfHome} sqft',
+                                  appointment: appointment)));
                     })),
             Padding(
                 padding: const EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0),
