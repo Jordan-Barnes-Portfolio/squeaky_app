@@ -13,6 +13,7 @@ class Appointment {
   Timestamp? sortByDate;
   String? uid;
   Invoice? invoice;
+  bool? hasReview;
 
   Appointment(
       {required this.formattedDate,
@@ -21,6 +22,7 @@ class Appointment {
       required this.invoice,
       required this.sortByDate,
       required this.status,
+      this.hasReview = false,
       this.uid});
 
   Map<String, dynamic> toMap() {
@@ -31,6 +33,7 @@ class Appointment {
       'sortByDate': sortByDate,
       'status': status,
       'uid': uid,
+      'hasReview': hasReview,
       'invoice': invoice?.toMap()
     };
   }
@@ -43,6 +46,7 @@ class Appointment {
         details: map['details'],
         status: map['status'],
         uid: map['uid'],
+        hasReview: map['hasReview'],
         invoice: Invoice.fromMap(map['invoice']));
   }
 }

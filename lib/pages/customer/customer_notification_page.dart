@@ -1,35 +1,31 @@
 // ignore_for_file: unused_local_variable, must_be_immutable, library_private_types_in_public_api
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:squeaky_app/components/cleaner_past_appointment_card.dart';
-import 'package:squeaky_app/components/customer_past_appointment_card.dart';
+import 'package:squeaky_app/components/customer_completed_appointment_card.dart';
 import 'package:squeaky_app/components/my_gnav_bar.dart';
 import 'package:squeaky_app/objects/appointment.dart';
 import 'package:squeaky_app/objects/user.dart';
 import 'package:squeaky_app/services/appointment_service.dart';
 
-class PastAppointmentsPage extends StatefulWidget {
+class CustomerNotificationPage extends StatefulWidget {
   final AppUser user; // AppUser object
   var currentPageIndex = -1;
-  PastAppointmentsPage({super.key, required this.user});
+  CustomerNotificationPage({super.key, required this.user});
 
   @override
-  _PastAppointmentsPage createState() => _PastAppointmentsPage();
+  _CustomerNotificationPage createState() => _CustomerNotificationPage();
 
   final _fireStore = FirebaseFirestore.instance;
   final ref = FirebaseFirestore.instance.collection('users').snapshots();
   Future<void> getData() async {
     QuerySnapshot querySnapshot = await _fireStore.collection('users').get();
     final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
-    final todaysAppointments =
-        AppointmentService().getTodaysAppointments(user.email);
-    final upcomingAppointments =
-        AppointmentService().getUpcomingAppointments(user.email);
+    final pastAppointments =
+        AppointmentService().getAllCompletedAppointments(user.email);
   }
 }
 
-class _PastAppointmentsPage extends State<PastAppointmentsPage> {
+class _CustomerNotificationPage extends State<CustomerNotificationPage> {
   @override
   void initState() {
     super.initState();
@@ -41,7 +37,7 @@ class _PastAppointmentsPage extends State<PastAppointmentsPage> {
       appBar: AppBar(
         centerTitle: true,
         title: const Text(
-          'Past Appointments',
+          'Notifications',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
@@ -64,7 +60,6 @@ class _PastAppointmentsPage extends State<PastAppointmentsPage> {
   }
 
   Widget _buildCurrentAppointmentList() {
-    var today = DateFormat('EEEE').format(DateTime.now());
     return StreamBuilder<QuerySnapshot>(
       stream:
           AppointmentService().getAllNonPendingAppointments(widget.user.email),
@@ -77,42 +72,19 @@ class _PastAppointmentsPage extends State<PastAppointmentsPage> {
           return const Center(
               child: Padding(
                   padding: EdgeInsets.all(20),
-                  child: Text('No appointments..',
+                  child: Text('No notifications..',
                       style: TextStyle(fontSize: 16))));
         }
         return ListView.builder(
-          
           shrinkWrap: true,
           itemCount: documents.length,
           itemBuilder: (context, index) {
-
             final document = documents[index];
             final data = document.data() as Map<String, dynamic>;
-
-            if (data['formattedDate'].toString().contains(today.toString())) {
-              var formattedDate =
-                  data['formattedDate'].toString().split('at')[1];
-              data['formattedDate'] = 'Today at$formattedDate';
-              return widget.user.isCleaner
-                  ? CleanerPastAppointmentCard(
-                      appointment: Appointment.fromMap(data),
-                      user: widget.user,
-                    )
-                  : CustomerPastAppointmentCard(
-                      appointment: Appointment.fromMap(data),
-                      user: widget.user,
-                    );
-            } else {
-              return widget.user.isCleaner
-                  ? CleanerPastAppointmentCard(
-                      appointment: Appointment.fromMap(data),
-                      user: widget.user,
-                    )
-                  : CustomerPastAppointmentCard(
-                      appointment: Appointment.fromMap(data),
-                      user: widget.user,
-                    );
-            }
+            return CustomerCompletedAppointmentCard(
+              appointment: Appointment.fromMap(data),
+              user: widget.user,
+            );
           },
         );
       },

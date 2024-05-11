@@ -160,7 +160,7 @@ class CleanerRegistrationPage extends StatelessWidget {
         isAdmin: false,
         isCleaner: true,
         isCustomer: false,
-        firstTime: false,
+        hasNotification: false,
       );
 
       final users = FirebaseFirestore.instance.collection('users');

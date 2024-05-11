@@ -1,6 +1,5 @@
 // ignore_for_file: unnecessary_getters_setters
 class AppUser {
-
   //Every account has these parameters
   String _email;
   String _password;
@@ -10,9 +9,8 @@ class AppUser {
   String _address;
   String _uuid;
 
-  //These are dependent 
+  //These are dependent
   String _bio;
-  num _pricing;
   String _ratings;
   String _rating;
   String _amountOfBedrooms;
@@ -24,6 +22,8 @@ class AppUser {
   String _profilePhoto;
   String _skills;
   String _heroPhoto;
+  num _pricing;
+  bool _hasNotification;
 
   //These are for account type
   bool _isCleaner;
@@ -56,7 +56,7 @@ class AppUser {
     bool isAdmin = false,
     bool isCleaner = false,
     bool isCustomer = false,
-    bool firstTime = true,
+    bool hasNotification = false,
 
     //Constructor
   })  : _email = email,
@@ -80,9 +80,14 @@ class AppUser {
         _skills = skills,
         _heroPhoto = heroPhoto,
         _uuid = uuid,
+        _hasNotification = hasNotification,
         _houseType = houseType;
 
   //Getters and setters
+
+  bool get hasNotification => _hasNotification;
+  set hasNotification(bool value) => _hasNotification = value;
+
   String get uuid => _uuid;
   set uuid(String value) => _uuid = value;
 
@@ -171,7 +176,8 @@ class AppUser {
       'floorType': _floorType,
       'profilePhoto': _profilePhoto,
       'skills': _skills,
-      'uuid': _uuid, 
+      'uuid': _uuid,
+      'hasNotification': _hasNotification,
       'heroPhoto': _heroPhoto,
     };
   }
@@ -194,6 +200,7 @@ class AppUser {
       houseType: map['houseType'] as String,
       isCleaner: map['isCleaner'] as bool,
       isCustomer: map['isCustomer'] as bool,
+      hasNotification: map['hasNotification'] as bool,
       rating: map['rating'] as String,
       ratings: map['ratings'] as String,
       profilePhoto: map['profilePhoto'] as String,

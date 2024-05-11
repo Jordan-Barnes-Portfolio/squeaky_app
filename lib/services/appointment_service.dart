@@ -116,7 +116,6 @@ class AppointmentService extends ChangeNotifier {
 
   void completeAppointment(Appointment appointment, AppUser user) async {
     try {
-
       appointment.status = 'completed';
 
       ChatService().sendMessage(
@@ -146,6 +145,22 @@ class AppointmentService extends ChangeNotifier {
           .collection('appointments')
           .doc(appointment.uid)
           .update(appointment.toMap());
+
+      final userRef = FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: appointment.invoice!.customerEmail)
+          .get();
+
+      await userRef.then((value) {
+        for (var element in value.docs) {
+          FirebaseFirestore.instance
+              .collection('users')
+              .doc(element.id)
+              .update({
+            'hasNotification': true,
+          });
+        }
+      });
     } on Exception catch (e) {
       throw Exception(e.toString());
     }
@@ -163,6 +178,21 @@ class AppointmentService extends ChangeNotifier {
           .orderBy('sortByDate')
           .where('sortByDate', isLessThanOrEqualTo: endOfDay)
           .where('status', isEqualTo: 'scheduled')
+          .snapshots();
+      return appointments;
+    } on Exception catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getAllCompletedAppointments(String email) {
+    try {
+      final appointments = _firebase
+          .collection('users')
+          .doc(email)
+          .collection('appointments')
+          .orderBy('sortByDate')
+          .where('status', isEqualTo: 'completed')
           .snapshots();
       return appointments;
     } on Exception catch (e) {
@@ -204,7 +234,8 @@ class AppointmentService extends ChangeNotifier {
     }
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getAllPendingAppointments(String email) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> getAllPendingAppointments(
+      String email) {
     try {
       final appointments = _firebase
           .collection('users')
@@ -220,7 +251,8 @@ class AppointmentService extends ChangeNotifier {
     }
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getAllNonPendingAppointments(String email) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> getAllNonPendingAppointments(
+      String email) {
     try {
       final appointments = _firebase
           .collection('users')

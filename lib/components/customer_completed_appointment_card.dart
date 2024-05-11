@@ -5,11 +5,11 @@ import 'package:squeaky_app/objects/appointment.dart';
 import 'package:squeaky_app/objects/user.dart';
 import 'package:squeaky_app/pages/customer/view_past_appointment_details_page.dart';
 
-class CustomerPastAppointmentCard extends StatelessWidget {
+class CustomerCompletedAppointmentCard extends StatelessWidget {
   final Appointment appointment;
   final AppUser user;
 
-  const CustomerPastAppointmentCard({
+  const CustomerCompletedAppointmentCard({
     Key? key,
     required this.appointment,
     required this.user,
@@ -34,21 +34,49 @@ class CustomerPastAppointmentCard extends StatelessWidget {
           children: [
             ListTile(
               title: Text(
-                'Cleaning with: $cleanerName',
+                'Review $cleanerName!',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                   fontSize: 18,
                 ),
               ),
+              subtitle: const Text(
+                'Please review your cleaner\'s performance.',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 14,
+                ),
+              )
             ),
             Positioned(
               right: 5,
               bottom: -4,
               child: TextButton(
                 child: const Text(
-                  'View Details',
+                  'Review',
                   style: TextStyle(fontSize: 16, color: Colors.black),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PastAppointmentDetailsPage(
+                        user: user,
+                        appointment: appointment,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Positioned(
+              left: 5,
+              bottom: -3,
+              child: TextButton(
+                child: Text(
+                  appointment.formattedDate,
+                  style: const TextStyle(fontSize: 14, color: Colors.black),
                 ),
                 onPressed: () {
                   Navigator.push(
@@ -67,19 +95,12 @@ class CustomerPastAppointmentCard extends StatelessWidget {
               right: 10,
               top: 20,
               child: RichText(
-                text: TextSpan(
+                text: const TextSpan(
                   children: <TextSpan>[
-                    appointment.status == 'completed' ? const TextSpan(
+                    TextSpan(
                       text: 'Completed',
                       style: TextStyle(
                         color: Colors.green,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ) :
-                    const TextSpan(
-                      text: 'Canceled',
-                      style: TextStyle(
-                        color: Colors.red,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -87,24 +108,6 @@ class CustomerPastAppointmentCard extends StatelessWidget {
                 ),
               ),
             ),
-            Positioned(
-              left: 16,
-              bottom: 10,
-              child: RichText(
-                text: TextSpan(
-                  children: <TextSpan>[
-                    TextSpan(
-                      text: appointment.formattedDate,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
           ],
         ),
       ),

@@ -130,8 +130,8 @@ class _ProfilePage extends State<ProfilePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => PastAppointmentsPage(user: widget.user)
-                  ),
+                      builder: (context) =>
+                          PastAppointmentsPage(user: widget.user)),
                 );
               },
               child: const Card(
@@ -195,6 +195,30 @@ class _ProfilePage extends State<ProfilePage> {
               ),
             ),
           ),
+          widget.user.isCleaner
+              ? Padding(
+                  padding: const EdgeInsets.only(bottom: 5),
+                  child: InkWell(
+                    onTap: () {
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //       builder: (context) => ReviewsPage(user: widget.user)),
+                      // );
+                    },
+                    child: const Card(
+                      elevation: 5,
+                      shadowColor: Colors.black12,
+                      surfaceTintColor: Colors.transparent,
+                      child: ListTile(
+                        leading: Icon(Icons.reviews_outlined),
+                        title: Text("Reviews"),
+                        trailing: Icon(Icons.chevron_right),
+                      ),
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink(),
           Padding(
             padding: const EdgeInsets.only(bottom: 5),
             child: InkWell(

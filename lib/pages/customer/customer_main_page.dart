@@ -6,8 +6,10 @@ import 'package:squeaky_app/components/customer_appointment_card.dart';
 import 'package:squeaky_app/components/my_appbar.dart';
 import 'package:squeaky_app/components/my_cleaner_card.dart';
 import 'package:squeaky_app/components/my_gnav_bar.dart';
+import 'package:squeaky_app/components/shake_widget.dart';
 import 'package:squeaky_app/objects/appointment.dart';
 import 'package:squeaky_app/objects/user.dart';
+import 'package:squeaky_app/pages/customer/customer_notification_page.dart';
 import 'package:squeaky_app/services/appointment_service.dart';
 
 class CustomerMainPage extends StatefulWidget {
@@ -32,23 +34,29 @@ class CustomerMainPage extends StatefulWidget {
 
 class _CustomerMainPage extends State<CustomerMainPage> {
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar(user: widget.user),
       backgroundColor: Colors.grey[200],
       bottomNavigationBar: MyGnavBar(
           currentPageIndex: widget.currentPageIndex, user: widget.user),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          AppointmentService().deleteAllAppointments();
-        },
-        child: const Icon(Icons.delete),
-      ),
+      floatingActionButton: widget.user.hasNotification
+          ? ShakeWidget(
+              key: const Key('shake'),
+              child: FloatingActionButton(
+                backgroundColor: Colors.green[300],
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          CustomerNotificationPage(user: widget.user),
+                    ),
+                  );
+                },
+                child: const Icon(Icons.notification_important),
+              ))
+          : const SizedBox.shrink(),
       body: SafeArea(
         child: DefaultTabController(
           length: 2,
@@ -140,7 +148,8 @@ class _CustomerMainPage extends State<CustomerMainPage> {
             final document = documents[index];
             final data = document.data() as Map<String, dynamic>;
             var now = DateTime.now();
-            var yesterday = DateTime(now.year, now.month, now.day - 1, 23, 59, 59);
+            var yesterday =
+                DateTime(now.year, now.month, now.day - 1, 23, 59, 59);
             DateTime date = data['sortByDate'].toDate();
 
             if (data['formattedDate'].toString().contains(today.toString())) {
@@ -151,7 +160,7 @@ class _CustomerMainPage extends State<CustomerMainPage> {
                 appointment: Appointment.fromMap(data),
                 user: widget.user,
               );
-            } else if(date.isBefore(yesterday)) {
+            } else if (date.isBefore(yesterday)) {
               return CustomerAppointmentCard(
                 appointment: Appointment.fromMap(data),
                 user: widget.user,

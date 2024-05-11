@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/profile_page.dart';
+import 'package:squeaky_app/pages/customer/customer_notification_page.dart';
 
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   final AppUser user;
@@ -20,12 +20,12 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 5,
       actions: [
         IconButton(
-          icon: const Icon(Icons.account_circle_outlined),
+          icon: const Icon(Icons.notifications),
           onPressed: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ProfilePage(user: user),
+                builder: (context) => CustomerNotificationPage(user: user),
               ),
             );
           },
