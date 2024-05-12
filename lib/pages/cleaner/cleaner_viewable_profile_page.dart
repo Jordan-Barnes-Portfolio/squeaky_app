@@ -14,7 +14,8 @@ class CleanerDetailsPage extends StatefulWidget {
   _CleanerDetailsPage createState() => _CleanerDetailsPage();
 }
 
-class _CleanerDetailsPage extends State<CleanerDetailsPage> {
+class _CleanerDetailsPage extends State<CleanerDetailsPage>
+    with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,6 +55,8 @@ class _CleanerDetailsPage extends State<CleanerDetailsPage> {
   }
 
   Widget tabViews() {
+    TabController newTabControl = TabController(length: widget.cleaner.reviews.length, vsync: this);
+
     return DefaultTabController(
       length: 2,
       child: Column(
@@ -110,17 +113,26 @@ class _CleanerDetailsPage extends State<CleanerDetailsPage> {
                     ],
                   ),
                 ),
-                widget.cleaner.ratings == '0'
+                TabPageSelector(
+                  color: Colors.black,
+                  selectedColor: Colors.blue,
+                  indicatorSize: 10,
+                  controller: newTabControl,
+                ),
+                widget.cleaner.ratings == 0
                     ? const Text(
                         'No reviews.. yet...',
                         textAlign: TextAlign.center,
                       )
-                    : ListView.builder(
-                        itemCount: 1,
+                    : PageView.builder(
+                        onPageChanged: (value) => newTabControl.animateTo(value),
+                        itemCount: widget.cleaner.reviews.length - 1,
                         itemBuilder: (context, index) {
                           return ListTile(
-                            title: Text('Review $index'),
-                            subtitle: const Text('Rating: 5'),
+                            title: Text(
+                                'Review from ${widget.cleaner.reviews[index].reviewerName}'),
+                            subtitle: Text(
+                                'Rating: ${widget.cleaner.reviews[index].rating.toString()}\n${widget.cleaner.reviews[index].details}'),
                           );
                         },
                       ),
@@ -232,7 +244,7 @@ class _CleanerDetailsPage extends State<CleanerDetailsPage> {
             text: TextSpan(
               children: <TextSpan>[
                 TextSpan(
-                  text: '\$${widget.cleaner.pricing}',
+                  text: '\$${widget.cleaner.pricing.toStringAsFixed(2)}',
                   style: const TextStyle(
                     fontSize: 20,
                     color: Colors.green,

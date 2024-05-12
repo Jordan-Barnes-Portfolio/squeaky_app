@@ -267,4 +267,22 @@ class AppointmentService extends ChangeNotifier {
       throw Exception(e.toString());
     }
   }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getAllNonReviewedAppointments(
+      String email) {
+    try {
+      final appointments = _firebase
+          .collection('users')
+          .doc(email)
+          .collection('appointments')
+          .orderBy('sortByDate')
+          .where('status', isEqualTo: 'completed')
+          .where('hasReview', isEqualTo: false)
+          .snapshots();
+
+      return appointments;
+    } on Exception catch (e) {
+      throw Exception(e.toString());
+    }
+  }
 }

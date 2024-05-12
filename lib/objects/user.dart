@@ -1,4 +1,6 @@
 // ignore_for_file: unnecessary_getters_setters
+import 'package:squeaky_app/objects/review.dart';
+
 class AppUser {
   //Every account has these parameters
   String _email;
@@ -11,8 +13,8 @@ class AppUser {
 
   //These are dependent
   String _bio;
-  String _ratings;
-  String _rating;
+  num _ratings;
+  num _rating;
   String _amountOfBedrooms;
   String _amountOfBathrooms;
   String _sqftOfHome;
@@ -24,6 +26,7 @@ class AppUser {
   String _heroPhoto;
   num _pricing;
   bool _hasNotification;
+  List<Review> _reviews = [];
 
   //These are for account type
   bool _isCleaner;
@@ -42,8 +45,8 @@ class AppUser {
     //Default and optional parameters
     String bio = "none",
     num pricing = 0,
-    String ratings = "0",
-    String rating = "0.0",
+    num ratings = 0,
+    num rating = 0,
     String amountOfBedrooms = "0",
     String amountOfBathrooms = "0",
     String sqftOfHome = "0",
@@ -57,6 +60,7 @@ class AppUser {
     bool isCleaner = false,
     bool isCustomer = false,
     bool hasNotification = false,
+    List<Review> reviews = const [],
 
     //Constructor
   })  : _email = email,
@@ -81,9 +85,12 @@ class AppUser {
         _heroPhoto = heroPhoto,
         _uuid = uuid,
         _hasNotification = hasNotification,
+        _reviews = reviews,
         _houseType = houseType;
 
   //Getters and setters
+  List<Review> get reviews => _reviews;
+  set reviews(List<Review> value) => _reviews = value;
 
   bool get hasNotification => _hasNotification;
   set hasNotification(bool value) => _hasNotification = value;
@@ -118,11 +125,11 @@ class AppUser {
   String get sqftOfHome => _sqftOfHome;
   set sqftOfHome(String value) => _sqftOfHome = value;
 
-  String get rating => _rating;
-  set rating(String value) => _rating = value;
+  num get rating => _rating;
+  set rating(num value) => _rating = value;
 
-  String get ratings => _ratings;
-  set ratings(String value) => _ratings = value;
+  num get ratings => _ratings;
+  set ratings(num value) => _ratings = value;
 
   num get pricing => _pricing;
   set pricing(num value) => _pricing = value;
@@ -177,36 +184,43 @@ class AppUser {
       'profilePhoto': _profilePhoto,
       'skills': _skills,
       'uuid': _uuid,
+      'reviews': _reviews.map((e) => e.toMap()).toList(),
       'hasNotification': _hasNotification,
       'heroPhoto': _heroPhoto,
     };
   }
 
   factory AppUser.fromMap(Map<String, dynamic> map) {
-    return AppUser(
-      email: map['email'] as String,
-      password: map['password'] as String,
-      firstName: map['firstName'] as String,
-      lastName: map['lastName'] as String,
-      phoneNumber: map['phoneNumber'] as String,
-      address: map['address'] as String,
-      bio: map['bio'] as String,
-      pricing: map['pricing'] as num,
-      storiesCount: map['storiesCount'] as String,
-      floorType: map['floorType'] as String,
-      amountOfBathrooms: map['amountOfBathrooms'] as String,
-      amountOfBedrooms: map['amountOfBedrooms'] as String,
-      sqftOfHome: map['sqftOfHome'] as String,
-      houseType: map['houseType'] as String,
-      isCleaner: map['isCleaner'] as bool,
-      isCustomer: map['isCustomer'] as bool,
-      hasNotification: map['hasNotification'] as bool,
-      rating: map['rating'] as String,
-      ratings: map['ratings'] as String,
-      profilePhoto: map['profilePhoto'] as String,
-      skills: map['skills'] as String,
-      heroPhoto: map['heroPhoto'] as String,
-      uuid: map['uuid'] as String,
-    );
+    try {
+      return AppUser(
+        email: map['email'] as String,
+        password: map['password'] as String,
+        firstName: map['firstName'] as String,
+        lastName: map['lastName'] as String,
+        phoneNumber: map['phoneNumber'] as String,
+        address: map['address'] as String,
+        bio: map['bio'] as String,
+        pricing: map['pricing'] as num,
+        storiesCount: map['storiesCount'] as String,
+        floorType: map['floorType'] as String,
+        amountOfBathrooms: map['amountOfBathrooms'] as String,
+        amountOfBedrooms: map['amountOfBedrooms'] as String,
+        sqftOfHome: map['sqftOfHome'] as String,
+        houseType: map['houseType'] as String,
+        isCleaner: map['isCleaner'] as bool,
+        isCustomer: map['isCustomer'] as bool,
+        hasNotification: map['hasNotification'] as bool,
+        rating: map['rating'] as num,
+        ratings: map['ratings'] as num,
+        profilePhoto: map['profilePhoto'] as String,
+        skills: map['skills'] as String,
+        reviews: List<Review>.from(
+            map['reviews']?.map((x) => Review.fromMap(x)) ?? const []),
+        heroPhoto: map['heroPhoto'] as String,
+        uuid: map['uuid'] as String,
+      );
+    } catch (e) {
+      throw Exception(e.toString());
+    }
   }
 }

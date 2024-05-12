@@ -2,6 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:squeaky_app/pages/error_page.dart';
 
 class MessagesCard extends StatelessWidget {
   MessagesCard(
@@ -24,73 +25,78 @@ class MessagesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: customFunction,
-      child: SizedBox(
-        width: double.infinity, // Set the desired width
-        height: 100, // Set the desired height
-        child: Card(
-          shadowColor: Colors.black,
-          surfaceTintColor: Colors.transparent,
-          shape: ContinuousRectangleBorder(
-            borderRadius: BorderRadius.circular(0),
-          ),
-          elevation: 2,
-          child: StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(recieverEmail.toString())
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                } else {
-                  document = snapshot.data;
-                  return ListTile(
-                    leading: document['profilePhoto'] == 'none'
-                        ? const CircleAvatar(
-                            backgroundColor: Colors.grey,
-                            radius: 30,
-                            child: Icon(
-                              Icons.person,
-                              color: Colors.white,
-                              size: 40,
+    try {
+      return GestureDetector(
+        onTap: customFunction,
+        child: SizedBox(
+          width: double.infinity, // Set the desired width
+          height: 100, // Set the desired height
+          child: Card(
+            shadowColor: Colors.black,
+            surfaceTintColor: Colors.transparent,
+            shape: ContinuousRectangleBorder(
+              borderRadius: BorderRadius.circular(0),
+            ),
+            elevation: 2,
+            child: StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(recieverEmail.toString())
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else {
+                    document = snapshot.data;
+                    return ListTile(
+                      leading: document['profilePhoto'] == 'none'
+                          ? const CircleAvatar(
+                              backgroundColor: Colors.grey,
+                              radius: 30,
+                              child: Icon(
+                                Icons.person,
+                                color: Colors.white,
+                                size: 40,
+                              ),
+                            )
+                          : CircleAvatar(
+                              radius: 30,
+                              backgroundImage: NetworkImage(
+                                  document['profilePhoto'].toString()),
                             ),
-                          )
-                        : CircleAvatar(
-                            radius: 30,
-                            backgroundImage: NetworkImage(
-                                document['profilePhoto'].toString()),
-                          ),
-                    title: Text(
-                      name,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    subtitle: Text(
-                      lastMessage,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    trailing: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          time,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
-                          ),
+                      title: Text(
+                        name,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
                         ),
-                        const SizedBox(height: 4),
-                      ],
-                    ),
-                  );
-                }
-              }),
+                      ),
+                      subtitle: Text(
+                        lastMessage,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            time,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                        ],
+                      ),
+                    );
+                  }
+                }),
+          ),
         ),
-      ),
-    );
+      );
+    } catch (e) {
+      print(e);
+    }
+    return const ErrorPage();
   }
 }

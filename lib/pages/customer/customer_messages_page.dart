@@ -8,6 +8,7 @@ import 'package:squeaky_app/components/my_gnav_bar.dart';
 import 'package:squeaky_app/objects/appointment.dart';
 import 'package:squeaky_app/objects/user.dart';
 import 'package:squeaky_app/pages/chat_page.dart';
+import 'package:squeaky_app/pages/error_page.dart';
 import 'package:squeaky_app/services/chat_service.dart';
 
 class CustomerMessagesPage extends StatefulWidget {
@@ -41,63 +42,73 @@ class _CustomerMessagesPage extends State<CustomerMessagesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: MyAppBar(user: widget.user),
-        backgroundColor: Colors.grey[200],
-        bottomNavigationBar: MyGnavBar(
-            currentPageIndex: widget.currentPageIndex, user: widget.user),
-        body: RefreshIndicator(
-          onRefresh: _refreshData,
-          color: Colors.black,
-          child: StreamBuilder<QuerySnapshot>(
-            stream: ChatService().getChatRooms(widget.user.email),
-            builder: (context, snapshot) {
-              if (snapshot.data == null) {
-                return const Center(child: Text('No messages..'));
-              } else if (snapshot.data!.docs.isEmpty) {
-                return const Center(child: Text('No messages..'));
-              }
-              final documents = snapshot.data!.docs;
+    try {
+      return Scaffold(
+          appBar: MyAppBar(user: widget.user),
+          backgroundColor: Colors.grey[200],
+          bottomNavigationBar: MyGnavBar(
+              currentPageIndex: widget.currentPageIndex, user: widget.user),
+          body: RefreshIndicator(
+            onRefresh: _refreshData,
+            color: Colors.black,
+            child: StreamBuilder<QuerySnapshot>(
+              stream: ChatService().getChatRooms(widget.user.email),
+              builder: (context, snapshot) {
+                if (snapshot.data == null) {
+                  return const Center(child: Text('No messages..'));
+                } else if (snapshot.data!.docs.isEmpty) {
+                  return const Center(child: Text('No messages..'));
+                }
+                final documents = snapshot.data!.docs;
 
-              // Sort the documents by closest time to now
-              documents.sort((a, b) {
-                final aTime = a['unformattedTime'] as Timestamp;
-                final bTime = b['unformattedTime'] as Timestamp;
-                final now = Timestamp.now();
+                // Sort the documents by closest time to now
+                documents.sort((a, b) {
+                  final aTime = a['unformattedTime'] as Timestamp;
+                  final bTime = b['unformattedTime'] as Timestamp;
+                  final now = Timestamp.now();
 
-                final aDifference = (aTime.seconds - now.seconds).abs();
-                final bDifference = (bTime.seconds - now.seconds).abs();
+                  final aDifference = (aTime.seconds - now.seconds).abs();
+                  final bDifference = (bTime.seconds - now.seconds).abs();
 
-                return aDifference.compareTo(bDifference);
-              });
+                  return aDifference.compareTo(bDifference);
+                });
 
-              return ListView.builder(
-                itemCount: documents.length,
-                itemBuilder: (context, index) {
-                  final data = documents[index].data() as Map<String, dynamic>;
-                  return MessagesCard(
-                    customFunction: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ChatPage(
-                                  appointment:
-                                      Appointment(formattedDate: '', details: '', unformattedDate: '', status: 'scheduled', invoice: null, sortByDate: null),
-                                  initialMessage: '',
-                                  receiverFirstName: data['cleanerFirstName'],
-                                  recieverUserEmail: data['userEmails']
-                                      ['cleaner'],
-                                  user: widget.user)));
-                    },
-                    name: data['cleanerFirstName'],
-                    lastMessage: data['lastMessage'],
-                    time: data['formattedTime'],
-                    recieverEmail: data['userEmails']['cleaner'],
-                  );
-                },
-              );
-            },
-          ),
-        ));
+                return ListView.builder(
+                  itemCount: documents.length,
+                  itemBuilder: (context, index) {
+                    final data =
+                        documents[index].data() as Map<String, dynamic>;
+                    return MessagesCard(
+                      customFunction: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ChatPage(
+                                    appointment: Appointment(
+                                        formattedDate: '',
+                                        details: '',
+                                        unformattedDate: '',
+                                        status: 'scheduled',
+                                        invoice: null,
+                                        sortByDate: null),
+                                    initialMessage: '',
+                                    receiverFirstName: data['cleanerFirstName'],
+                                    recieverUserEmail: data['userEmails']
+                                        ['cleaner'],
+                                    user: widget.user)));
+                      },
+                      name: data['cleanerFirstName'],
+                      lastMessage: data['lastMessage'],
+                      time: data['formattedTime'],
+                      recieverEmail: data['userEmails']['cleaner'],
+                    );
+                  },
+                );
+              },
+            ),
+          ));
+    } catch (e) {
+      return const ErrorPage();
+    }
   }
 }

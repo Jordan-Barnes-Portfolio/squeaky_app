@@ -33,6 +33,8 @@ class _CustomerNotificationPage extends State<CustomerNotificationPage> {
 
   @override
   Widget build(BuildContext context) {
+    
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -62,7 +64,7 @@ class _CustomerNotificationPage extends State<CustomerNotificationPage> {
   Widget _buildCurrentAppointmentList() {
     return StreamBuilder<QuerySnapshot>(
       stream:
-          AppointmentService().getAllNonPendingAppointments(widget.user.email),
+          AppointmentService().getAllNonReviewedAppointments(widget.user.email),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());

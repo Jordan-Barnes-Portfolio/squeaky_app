@@ -43,6 +43,7 @@ dependencies:
   provider:
   firebase_messaging: ^14.9.2
   rxdart: ^0.27.7
+  givestarreviews: ^1.0.2
 
 dev_dependencies:
   flutter_test:

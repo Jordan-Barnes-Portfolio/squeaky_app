@@ -13,7 +13,7 @@ import 'package:squeaky_app/pages/customer/customer_notification_page.dart';
 import 'package:squeaky_app/services/appointment_service.dart';
 
 class CustomerMainPage extends StatefulWidget {
-  final AppUser user; // AppUser object
+  AppUser user; // AppUser object
   var currentPageIndex = 0;
   CustomerMainPage({super.key, required this.user});
 
@@ -29,10 +29,19 @@ class CustomerMainPage extends StatefulWidget {
         AppointmentService().getTodaysAppointments(user.email);
     final upcomingAppointments =
         AppointmentService().getUpcomingAppointments(user.email);
+    final users = FirebaseFirestore.instance.collection('users');
+    var doc = await users.doc(user.email).get();
+    user = AppUser.fromMap(doc.data() as Map<String, dynamic>);
   }
 }
 
 class _CustomerMainPage extends State<CustomerMainPage> {
+  @override
+  void initState() {
+    super.initState();
+    widget.getData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

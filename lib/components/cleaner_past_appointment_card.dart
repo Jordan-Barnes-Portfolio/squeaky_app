@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:squeaky_app/objects/appointment.dart';
 import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/customer/view_past_appointment_details_page.dart';
+import 'package:squeaky_app/pages/customer/customer_view_past_appointment_details_page.dart';
 
 class CleanerPastAppointmentCard extends StatelessWidget {
   final Appointment appointment;

@@ -103,7 +103,7 @@ class CleanerCard extends StatelessWidget {
                   text: TextSpan(
                     children: <TextSpan>[
                       TextSpan(
-                        text: '\$${cleaner.pricing}',
+                        text: '\$${cleaner.pricing.toStringAsFixed(2)}',
                         style: const TextStyle(
                           fontSize: 16,
                           color: Colors.green,
