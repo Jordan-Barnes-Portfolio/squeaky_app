@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:squeaky_app/components/my_button.dart';
+import 'package:neatfreak/components/my_button.dart';
 
 class ErrorPage extends StatelessWidget {
   const ErrorPage({super.key});

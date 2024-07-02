@@ -12,7 +12,7 @@ class MyTextField extends StatelessWidget{
     required this.controller, 
     required this.hintText, 
     required this.obscureText,
-    required this.label,
+    required this.label
     });
 
   @override

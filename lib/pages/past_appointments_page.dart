@@ -2,12 +2,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:squeaky_app/components/cleaner_past_appointment_card.dart';
-import 'package:squeaky_app/components/customer_past_appointment_card.dart';
-import 'package:squeaky_app/components/my_gnav_bar.dart';
-import 'package:squeaky_app/objects/appointment.dart';
-import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/services/appointment_service.dart';
+import 'package:neatfreak/components/cleaner_past_appointment_card.dart';
+import 'package:neatfreak/components/customer_past_appointment_card.dart';
+import 'package:neatfreak/components/my_gnav_bar.dart';
+import 'package:neatfreak/objects/appointment.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/services/appointment_service.dart';
 
 class PastAppointmentsPage extends StatefulWidget {
   final AppUser user; // AppUser object
@@ -53,13 +53,7 @@ class _PastAppointmentsPage extends State<PastAppointmentsPage> {
       backgroundColor: Colors.grey[200],
       bottomNavigationBar: MyGnavBar(
           currentPageIndex: widget.currentPageIndex, user: widget.user),
-      body: SafeArea(
-          child: SingleChildScrollView(
-              child: Column(
-        children: [
-          _buildCurrentAppointmentList(),
-        ],
-      ))),
+      body: _buildCurrentAppointmentList(),
     );
   }
 
@@ -81,11 +75,8 @@ class _PastAppointmentsPage extends State<PastAppointmentsPage> {
                       style: TextStyle(fontSize: 16))));
         }
         return ListView.builder(
-          
-          shrinkWrap: true,
           itemCount: documents.length,
           itemBuilder: (context, index) {
-
             final document = documents[index];
             final data = document.data() as Map<String, dynamic>;
 

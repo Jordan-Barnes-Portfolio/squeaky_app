@@ -1,4 +1,4 @@
-import 'package:squeaky_app/objects/user.dart';
+import 'package:neatfreak/objects/user.dart';
 
 class Invoice {
   final num total;

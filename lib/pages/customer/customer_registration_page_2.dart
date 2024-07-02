@@ -1,8 +1,8 @@
 // ignore_for_file: use_key_in_widget_constructors, prefer_const_constructors_in_immutables, library_private_types_in_public_api
 import 'package:flutter/material.dart';
-import 'package:squeaky_app/components/my_button.dart';
-import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/customer/customer_registration_page_3.dart';
+import 'package:neatfreak/components/my_button.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/pages/customer/customer_registration_page_3.dart';
 
 class CustomerRegistrationPage2 extends StatefulWidget {
   final AppUser user; // AppUser object

@@ -1,9 +1,9 @@
 // ignore_for_file: use_key_in_widget_constructors
 
 import 'package:flutter/material.dart';
-import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/cleaner/cleaner_viewable_profile_page.dart';
-import 'package:squeaky_app/pages/customer/customer_booking_page.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/pages/cleaner/cleaner_viewable_profile_page.dart';
+import 'package:neatfreak/pages/customer/customer_booking_page.dart';
 
 class CleanerCard extends StatelessWidget {
   final AppUser cleaner;
@@ -19,10 +19,20 @@ class CleanerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     String name = cleaner.firstName;
     String lastInitial = cleaner.lastName[0];
+//     double distance = FlutterMapMath().distanceBetween(
+//     user.location.latitude,
+//     user.location.longitude,
+//     cleaner.location.latitude,
+//     cleaner.location.longitude,
+//     "miles"
+// );
+//     String distanceString = distance.toStringAsFixed(2); 
 
     return GestureDetector(
       onTap: () => {
         showModalBottomSheet(
+            showDragHandle: true,
+            backgroundColor: Colors.grey[300],
             barrierColor: Color(const Color.fromARGB(113, 238, 238, 238).value),
             isScrollControlled: true,
             constraints: BoxConstraints(
@@ -121,13 +131,38 @@ class CleanerCard extends StatelessWidget {
                   ),
                 ),
               ),
+              // Positioned(
+              //   right: 10,
+              //   top: 30,
+              //   child: RichText(
+              //     text: TextSpan(
+              //       children: <TextSpan>[
+              //         TextSpan(
+              //           text: '${distanceString}',
+              //           style: const TextStyle(
+              //             fontSize: 14,
+              //             color: Colors.grey,
+              //             fontWeight: FontWeight.bold,
+              //           ),
+              //         ),
+              //         const TextSpan(
+              //           text: ' miles',
+              //           style: TextStyle(
+              //             color: Colors.black,
+              //             fontWeight: FontWeight.normal,
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
               Positioned(
                 left: 20,
                 bottom: 10,
                 child: Row(
                   children: [
                     Text(
-                      cleaner.rating.toString(),
+                      cleaner.rating.toStringAsFixed(1),
                       style: const TextStyle(
                         color: Colors.black,
                       ),

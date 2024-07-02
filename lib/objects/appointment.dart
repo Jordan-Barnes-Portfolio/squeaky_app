@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:squeaky_app/objects/invoice.dart';
-import 'package:squeaky_app/objects/user.dart';
+import 'package:neatfreak/objects/invoice.dart';
+import 'package:neatfreak/objects/user.dart';
 
 class Appointment {
   String formattedDate;

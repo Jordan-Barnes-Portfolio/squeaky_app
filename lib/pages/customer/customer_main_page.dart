@@ -1,20 +1,21 @@
 // ignore_for_file: unused_local_variable, must_be_immutable, library_private_types_in_public_api
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map_math/flutter_geo_math.dart';
 import 'package:intl/intl.dart';
-import 'package:squeaky_app/components/customer_appointment_card.dart';
-import 'package:squeaky_app/components/my_appbar.dart';
-import 'package:squeaky_app/components/my_cleaner_card.dart';
-import 'package:squeaky_app/components/my_gnav_bar.dart';
-import 'package:squeaky_app/components/shake_widget.dart';
-import 'package:squeaky_app/objects/appointment.dart';
-import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/customer/customer_notification_page.dart';
-import 'package:squeaky_app/services/appointment_service.dart';
+import 'package:neatfreak/components/customer_appointment_card.dart';
+import 'package:neatfreak/components/my_appbar.dart';
+import 'package:neatfreak/components/my_cleaner_card.dart';
+import 'package:neatfreak/components/my_gnav_bar.dart';
+import 'package:neatfreak/objects/appointment.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/services/appointment_service.dart';
 
 class CustomerMainPage extends StatefulWidget {
   AppUser user; // AppUser object
   var currentPageIndex = 0;
+  var availCleaners = 0;
+  var flipped = false;
   CustomerMainPage({super.key, required this.user});
 
   @override
@@ -23,15 +24,15 @@ class CustomerMainPage extends StatefulWidget {
   final _fireStore = FirebaseFirestore.instance;
   final ref = FirebaseFirestore.instance.collection('users').snapshots();
   Future<void> getData() async {
+    final users = FirebaseFirestore.instance.collection('users');
+    var doc = await users.doc(user.email).get();
+    user = AppUser.fromMap(doc.data() as Map<String, dynamic>);
     QuerySnapshot querySnapshot = await _fireStore.collection('users').get();
     final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
     final todaysAppointments =
         AppointmentService().getTodaysAppointments(user.email);
     final upcomingAppointments =
         AppointmentService().getUpcomingAppointments(user.email);
-    final users = FirebaseFirestore.instance.collection('users');
-    var doc = await users.doc(user.email).get();
-    user = AppUser.fromMap(doc.data() as Map<String, dynamic>);
   }
 }
 
@@ -40,32 +41,20 @@ class _CustomerMainPage extends State<CustomerMainPage> {
   void initState() {
     super.initState();
     widget.getData();
+    _buildCleanerList();
   }
 
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      widget.getData();
+    });
+
     return Scaffold(
       appBar: MyAppBar(user: widget.user),
       backgroundColor: Colors.grey[200],
       bottomNavigationBar: MyGnavBar(
           currentPageIndex: widget.currentPageIndex, user: widget.user),
-      floatingActionButton: widget.user.hasNotification
-          ? ShakeWidget(
-              key: const Key('shake'),
-              child: FloatingActionButton(
-                backgroundColor: Colors.green[300],
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          CustomerNotificationPage(user: widget.user),
-                    ),
-                  );
-                },
-                child: const Icon(Icons.notification_important),
-              ))
-          : const SizedBox.shrink(),
       body: SafeArea(
         child: DefaultTabController(
           length: 2,
@@ -118,15 +107,28 @@ class _CustomerMainPage extends State<CustomerMainPage> {
               return const Center(
                   child: Text('No cleaners available in your area.. yet.'));
             } else {
+              widget.flipped = true;
               final document = documents[index];
               final data = document.data() as Map<String, dynamic>;
-              if (data['isCleaner'] != true) {
+              if (data['isCleaner'] == true && data['maxDistance'] > calculateDistance(data['location'] as GeoPoint, widget.user.location)) {
+                widget.availCleaners++;
+                return CleanerCard(
+                  cleaner: AppUser.fromMap(data),
+                  user: widget.user,
+                );
+            } else {
+              if(widget.flipped){
                 return const SizedBox.shrink();
+              } else {
+                widget.flipped = true;
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Text('No cleaners available in your area.. yet.'),
+                  ),
+                );
               }
-              return CleanerCard(
-                cleaner: AppUser.fromMap(data),
-                user: widget.user,
-              );
+              }
             }
           },
         );
@@ -185,5 +187,10 @@ class _CustomerMainPage extends State<CustomerMainPage> {
         );
       },
     );
+  }
+
+  num calculateDistance(GeoPoint location1, GeoPoint location2) {
+    return FlutterMapMath().distanceBetween(location1.latitude,
+        location1.longitude, location2.latitude, location2.longitude, "miles");
   }
 }

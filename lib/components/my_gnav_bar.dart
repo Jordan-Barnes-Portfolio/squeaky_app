@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/cleaner/cleaner_main_page.dart';
-import 'package:squeaky_app/pages/customer/customer_main_page.dart';
-import 'package:squeaky_app/pages/cleaner/cleaner_messages_page.dart';
-import 'package:squeaky_app/pages/customer/customer_messages_page.dart';
-import 'package:squeaky_app/pages/profile_page.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/pages/cleaner/cleaner_main_page.dart';
+import 'package:neatfreak/pages/customer/customer_main_page.dart';
+import 'package:neatfreak/pages/cleaner/cleaner_messages_page.dart';
+import 'package:neatfreak/pages/customer/customer_messages_page.dart';
+import 'package:neatfreak/pages/profile_page.dart';
 
 class MyGnavBar extends StatelessWidget {
   final AppUser user;

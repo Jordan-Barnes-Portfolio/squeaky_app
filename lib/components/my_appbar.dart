@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/customer/customer_notification_page.dart';
+import 'package:neatfreak/components/shake_widget.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/pages/customer/customer_notification_page.dart';
 
 class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   final AppUser user;
@@ -20,7 +21,13 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 5,
       actions: [
         IconButton(
-          icon: const Icon(Icons.notifications),
+          icon: user.hasNotification
+              ? const ShakeWidget(
+                  key: Key('shake'),
+                  child: Icon(
+                    Icons.notification_important,
+                  ))
+              : const Icon(Icons.notifications),
           onPressed: () {
             Navigator.push(
               context,

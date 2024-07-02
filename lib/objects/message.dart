@@ -1,4 +1,5 @@
-import 'package:squeaky_app/objects/appointment.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:neatfreak/objects/appointment.dart';
 
 class Message {
   final String senderEmail;
@@ -11,6 +12,7 @@ class Message {
   final bool systemMessage;
   final DateTime timestamp;
   final Appointment ?appointment;
+  final FieldValue orderBy = FieldValue.serverTimestamp();
 
   Message({
     required this.senderEmail,
@@ -38,6 +40,7 @@ class Message {
       'containsQuote': containsQuote,
       'containsInvoice': containsInvoice,
       'systemMessage': systemMessage,
+      'orderBy': orderBy,
       'appointment': appointment?.toMap()
     };
   }

@@ -6,13 +6,13 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:squeaky_app/components/my_button.dart';
-import 'package:squeaky_app/components/my_drop_down_field.dart';
-import 'package:squeaky_app/components/my_gnav_bar.dart';
-import 'package:squeaky_app/components/my_number_field.dart';
-import 'package:squeaky_app/components/my_text_field.dart';
-import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/util/utils.dart';
+import 'package:neatfreak/components/my_button.dart';
+import 'package:neatfreak/components/my_drop_down_field.dart';
+import 'package:neatfreak/components/my_gnav_bar.dart';
+import 'package:neatfreak/components/my_number_field.dart';
+import 'package:neatfreak/components/my_text_field.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/util/utils.dart';
 
 class CustomerAccountDetailsPage extends StatefulWidget {
   const CustomerAccountDetailsPage({super.key, required this.user});

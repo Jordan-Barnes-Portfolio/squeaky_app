@@ -2,21 +2,28 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:squeaky_app/pages/error_page.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/pages/error_page.dart';
 
-class MessagesCard extends StatelessWidget {
-  MessagesCard(
+class CustomerMessagesCard extends StatelessWidget {
+  CustomerMessagesCard(
       {super.key,
+      required this.user,
       required this.name,
       required this.lastMessage,
       required this.time,
       required this.recieverEmail,
-      required this.customFunction});
+      required this.customFunction,
+      required this.seenByCustomer,
+      required this.seenByCleaner,});
 
   final String name;
   final String lastMessage;
   final String time;
   final String recieverEmail;
+  final AppUser user;
+  bool seenByCustomer;
+  bool seenByCleaner;
   var customFunction;
 
   var document;
@@ -86,6 +93,12 @@ class MessagesCard extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 4),
+                          if (!seenByCustomer)
+                            const Icon(
+                              Icons.circle,
+                              color: Colors.blue,
+                              size: 10,
+                            ),
                         ],
                       ),
                     );

@@ -4,12 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:squeaky_app/components/my_button.dart';
-import 'package:squeaky_app/components/my_gnav_bar.dart';
-import 'package:squeaky_app/components/my_large_text_field.dart';
-import 'package:squeaky_app/objects/appointment.dart';
-import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/chat_page.dart';
+import 'package:neatfreak/components/my_button.dart';
+import 'package:neatfreak/components/my_gnav_bar.dart';
+import 'package:neatfreak/components/my_large_text_field.dart';
+import 'package:neatfreak/objects/appointment.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/pages/chat_page.dart';
 
 class CustomerBookingPage extends StatefulWidget {
   final AppUser user; // AppUser object
@@ -27,11 +27,32 @@ class _CustomerBookingPage extends State<CustomerBookingPage> {
   TextEditingController detailsController = TextEditingController();
   TextEditingController appointmentTimeController = TextEditingController();
   TextEditingController appointmentController = TextEditingController();
+  TextEditingController entryDetailsController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     DateTime now = DateTime.now();
     DateTime date = DateTime(now.year, now.month, now.day, now.hour + 1);
+
+    void updateUserEntryDetails(String entryDetails) {
+      print('updating..');
+      final userRef = FirebaseFirestore.instance
+                      .collection('users')
+                      .where('email', isEqualTo: widget.user.email)
+                      .get();
+                  userRef.then((value) {
+                    for (var element in value.docs) {
+                      FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(element.id)
+                          .update({
+                        'impInformation': entryDetails,
+                      });
+                    }
+                  });
+                  setState(() {});
+    }
+    
 
     return Scaffold(
         appBar: AppBar(
@@ -82,27 +103,63 @@ class _CustomerBookingPage extends State<CustomerBookingPage> {
                 ),
               ),
             ),
-            Padding(
-                padding: const EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0),
-                child: Text('Make this appointment recurring.',
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]))),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(22, 8, 22, 8),
-              child: TextField(
-                controller: appointmentController,
-                readOnly: true,
-                decoration: const InputDecoration(
-                  labelText: 'Recurring selection (coming soon)',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ),
+            // Padding(
+            //     padding: const EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0),
+            //     child: Text('Make this appointment recurring.',
+            //         style: TextStyle(fontSize: 12, color: Colors.grey[600]))),
+            // const Padding(
+            //   padding: const EdgeInsets.fromLTRB(22, 8, 22, 8),
+            //   child: TextField(
+            //     controller: null,
+            //     readOnly: true,
+            //     decoration: InputDecoration(
+            //       labelText: 'Recurring Appointment (coming soon)',
+            //       border: OutlineInputBorder(),
+            //     ),
+            //   ),
+            // ),
+            widget.user.impInformation == "None"
+                ? Padding(
+                    padding: const EdgeInsets.only(
+                        left: 23, right: 23, top: 5, bottom: 5),
+                    child: TextField(
+                      onTapOutside: (PointerDownEvent event) {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                      },
+                      maxLines: 4,
+                      controller: entryDetailsController,
+                      obscureText: false,
+                      decoration: const InputDecoration(
+                        alignLabelWithHint: true,
+                        border: OutlineInputBorder(),
+                        hintText:
+                            'Permanent Details.., \n\nExample: Please ring the doorbell, cleaning supplies are under the sink! thank you.',
+                      ),
+                    ),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.only(
+                        left: 23, right: 23, top: 5, bottom: 5),
+                    child: TextField(
+                      onTapOutside: (PointerDownEvent event) {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                      },
+                      maxLines: 4,
+                      controller: entryDetailsController,
+                      obscureText: false,
+                      decoration: InputDecoration(
+                        alignLabelWithHint: true,
+                        border: const OutlineInputBorder(),
+                        hintText: widget.user.impInformation,
+                      ),
+                    ),
+                  ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: MyLargeTextField(
                 controller: detailsController,
                 hintText:
-                    'Enter any additional details about your cleaning request here.. \n\nExample: I just want my closet cleaned, I have a pet, etc.',
+                    'Enter any additional details about your cleaning request here.. \n\nExample: I just want my closet cleaned, only clean the first floor, etc.',
                 obscureText: false,
               ),
             ),
@@ -134,6 +191,12 @@ class _CustomerBookingPage extends State<CustomerBookingPage> {
                           },
                         );
                       }
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text(
+                                'You have requested an appointment with ${widget.cleaner.firstName} they will respond shortly!')),
+                      );
                       Appointment appointment = Appointment(
                           formattedDate: appointmentController.text,
                           details: detailsController.text,
@@ -142,6 +205,13 @@ class _CustomerBookingPage extends State<CustomerBookingPage> {
                               DateTime.parse(appointmentTimeController.text)),
                           invoice: null,
                           status: 'scheduled');
+
+                      if(entryDetailsController.text != widget.user.impInformation && entryDetailsController.text != ""){
+                        updateUserEntryDetails(entryDetailsController.text);
+                        detailsController.text = "${detailsController.text}\nImportant: ${entryDetailsController.text}";
+                      } else {
+                        detailsController.text = "${detailsController.text}\nImportant: ${widget.user.impInformation}";
+                      }
                       Navigator.push(
                           context,
                           MaterialPageRoute(

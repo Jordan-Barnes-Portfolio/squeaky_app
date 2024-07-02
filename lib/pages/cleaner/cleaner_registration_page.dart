@@ -1,20 +1,25 @@
 // ignore_for_file: use_build_context_synchronously
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:squeaky_app/components/my_button.dart';
-import 'package:squeaky_app/components/my_drop_down_field.dart';
-import 'package:squeaky_app/components/my_number_field.dart';
-import 'package:squeaky_app/components/my_text_field.dart';
-import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/cleaner/cleaner_registration_page_2.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:neatfreak/components/my_button.dart';
+import 'package:neatfreak/components/my_drop_down_field.dart';
+import 'package:neatfreak/components/my_number_field.dart';
+import 'package:neatfreak/components/my_text_field.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/pages/cleaner/cleaner_registration_page_2.dart';
+import 'package:http/http.dart' as http;
+import 'package:geocoding/geocoding.dart';
 
 class CleanerRegistrationPage extends StatelessWidget {
   const CleanerRegistrationPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    
     //Controllers
-
     final passwordController = TextEditingController();
     final confirmPasswordController = TextEditingController();
     final emailController = TextEditingController();
@@ -34,6 +39,36 @@ class CleanerRegistrationPage extends StatelessWidget {
       RegExp regExp = RegExp(p);
 
       return regExp.hasMatch(em);
+    }
+
+    Future predictAddress(String input) async {
+      String apiKey = dotenv.env['GOOGLE_PLACES_API_KEY']!;
+      String groundURL = "https://places.googleapis.com/v1/places:autocomplete";
+
+      var response = await http.post(Uri.parse(groundURL),
+          headers: {
+            "Content-Type": "application/json",
+            "X-Goog-Api-Key": apiKey
+          },
+          body: json.encode({
+            "input": input,
+            "includedRegionCodes": ["us"]
+          }));
+      var resultData = response.body.toString();
+
+      if (response.statusCode == 200) {
+        try {
+          var data = json.decode(resultData);
+          var predictions = data["suggestions"];
+          var structuredAddress =
+              predictions[0]['placePrediction']['text']['text'];
+          return structuredAddress as String;
+        } catch (e) {
+          return [];
+        }
+      } else {
+        throw Exception('Failed to load predictions');
+      }
     }
 
     //Functions
@@ -155,13 +190,40 @@ class CleanerRegistrationPage extends StatelessWidget {
         phoneNumber: phoneController.text,
         firstName: firstnameController.text,
         lastName: lastnameController.text,
-        address:
-            "${addressController.text} ${address2Controller.text} ${cityController.text}, ${stateController.text} ${zipCodeController.text}",
+        address: "${addressController.text} ${address2Controller.text} ${cityController.text}, ${stateController.text} ${zipCodeController.text}",
         isAdmin: false,
         isCleaner: true,
         isCustomer: false,
         hasNotification: false,
+        impInformation: "None",
       );
+
+      var prediction = await predictAddress(user.address);
+
+      try {
+        List<Location> locations = await locationFromAddress(prediction.toString());
+        GeoPoint location = GeoPoint(locations[0].latitude, locations[0].longitude);
+        user.location = location;
+      } catch (e) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Error'),
+            content: const Text(
+                'Please enter a valid united states address, we need it!'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context, rootNavigator: true)
+                      .pop(); // dismisses only the dialog and returns nothing
+                },
+                child: const Text('Ok'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
 
       final users = FirebaseFirestore.instance.collection('users');
       var doc = await users.doc(user.email).get();
@@ -268,7 +330,7 @@ class CleanerRegistrationPage extends StatelessWidget {
               obscureText: false,
               label: "Address Line 1",
             ),
-             MyTextField(
+            MyTextField(
               controller: address2Controller,
               hintText: 'Address line 2 (optional)',
               obscureText: false,
@@ -363,7 +425,10 @@ class CleanerRegistrationPage extends StatelessWidget {
               GestureDetector(
                   child: const Text('Go Back'),
                   onTap: () => Navigator.pop(context))
-            ])
+            ]),
+            const SizedBox(
+              height: 25,
+            )
           ],
         ))));
   }

@@ -6,17 +6,16 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:squeaky_app/components/my_appbar.dart';
-import 'package:squeaky_app/components/my_gnav_bar.dart';
-import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/cleaner/cleaner_account_details_page.dart';
-import 'package:squeaky_app/pages/customer/customer_account_details_page.dart';
-import 'package:squeaky_app/pages/legal_page.dart';
-import 'package:squeaky_app/pages/past_appointments_page.dart';
-import 'package:squeaky_app/pages/support_page.dart';
-import 'package:squeaky_app/services/authentication_gate.dart';
-import 'package:squeaky_app/services/authentication_service.dart';
-import 'package:squeaky_app/util/utils.dart';
+import 'package:neatfreak/components/my_appbar.dart';
+import 'package:neatfreak/components/my_gnav_bar.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/pages/cleaner/cleaner_account_details_page.dart';
+import 'package:neatfreak/pages/customer/customer_account_details_page.dart';
+import 'package:neatfreak/pages/past_appointments_page.dart';
+import 'package:neatfreak/services/authentication_gate.dart';
+import 'package:neatfreak/services/authentication_service.dart';
+import 'package:neatfreak/util/utils.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key, required this.user});
@@ -223,11 +222,7 @@ class _ProfilePage extends State<ProfilePage> {
             padding: const EdgeInsets.only(bottom: 5),
             child: InkWell(
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => SupportPage(user: widget.user)),
-                );
+                launchUrlString('https://neatfreak.us/contact');
               },
               child: const Card(
                 elevation: 5,
@@ -245,11 +240,7 @@ class _ProfilePage extends State<ProfilePage> {
             padding: const EdgeInsets.only(bottom: 5),
             child: InkWell(
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => LegalPage(user: widget.user)),
-                );
+                launchUrlString('https://neatfreak.us/terms-of-service');
               },
               child: const Card(
                 elevation: 5,

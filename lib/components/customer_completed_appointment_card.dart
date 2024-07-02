@@ -1,13 +1,13 @@
 // ignore_for_file: use_key_in_widget_constructors
 
 import 'package:flutter/material.dart';
-import 'package:squeaky_app/components/give_star_reviews.dart';
-import 'package:squeaky_app/components/my_button.dart';
-import 'package:squeaky_app/components/my_large_text_field.dart';
-import 'package:squeaky_app/objects/appointment.dart';
-import 'package:squeaky_app/objects/review.dart';
-import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/services/cleaner_service.dart';
+import 'package:neatfreak/components/give_star_reviews.dart';
+import 'package:neatfreak/components/my_button.dart';
+import 'package:neatfreak/components/my_large_text_field.dart';
+import 'package:neatfreak/objects/appointment.dart';
+import 'package:neatfreak/objects/review.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/services/cleaner_service.dart';
 
 class CustomerCompletedAppointmentCard extends StatelessWidget {
   final Appointment appointment;

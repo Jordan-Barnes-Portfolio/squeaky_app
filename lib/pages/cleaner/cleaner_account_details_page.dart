@@ -6,14 +6,14 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:squeaky_app/components/my_button.dart';
-import 'package:squeaky_app/components/my_drop_down_field.dart';
-import 'package:squeaky_app/components/my_gnav_bar.dart';
-import 'package:squeaky_app/components/my_large_text_field.dart';
-import 'package:squeaky_app/components/my_number_field.dart';
-import 'package:squeaky_app/components/my_text_field.dart';
-import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/util/utils.dart';
+import 'package:neatfreak/components/my_button.dart';
+import 'package:neatfreak/components/my_drop_down_field.dart';
+import 'package:neatfreak/components/my_gnav_bar.dart';
+import 'package:neatfreak/components/my_large_text_field.dart';
+import 'package:neatfreak/components/my_number_field.dart';
+import 'package:neatfreak/components/my_text_field.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/util/utils.dart';
 
 class CleanerAccountDetailsPage extends StatefulWidget {
   const CleanerAccountDetailsPage({super.key, required this.user});
@@ -35,6 +35,7 @@ class _CleanerAccountDetailsPage extends State<CleanerAccountDetailsPage> {
   var pphController = TextEditingController();
   var bioController = TextEditingController();
   var skillsController = TextEditingController();
+  var distanceController = TextEditingController();
 
   void selectProfileImage() async {
     try {
@@ -721,6 +722,25 @@ class _CleanerAccountDetailsPage extends State<CleanerAccountDetailsPage> {
           padding: const EdgeInsets.only(bottom: 5),
           child: InkWell(
             onTap: () {
+              distanceChange();
+            },
+            child: Card(
+              elevation: 5,
+              shadowColor: Colors.black12,
+              surfaceTintColor: Colors.transparent,
+              child: ListTile(
+                leading: const Icon(Icons.person_2),
+                title: Text(
+                    "Distance willing to travel: ${widget.user.maxDistance} miles"),
+                trailing: const Icon(Icons.chevron_right),
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 5),
+          child: InkWell(
+            onTap: () {
               bioChange();
             },
             child: Card(
@@ -820,7 +840,7 @@ class _CleanerAccountDetailsPage extends State<CleanerAccountDetailsPage> {
             bottom: 0,
             left: 134,
             child: Text(
-              widget.user.rating.toString(),
+              widget.user.rating.toStringAsFixed(1),
               style: const TextStyle(
                 fontSize: 14,
                 color: Colors.black,
@@ -912,6 +932,68 @@ class _CleanerAccountDetailsPage extends State<CleanerAccountDetailsPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void distanceChange() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        color: Colors.grey[200],
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            const SizedBox(height: 40),
+            const Text('Enter your updated distance your willing to travel..',
+                style: TextStyle(color: Colors.black, fontSize: 18)),
+            const Divider(),
+            Padding(
+              padding: const EdgeInsets.only(
+                  left: 15, right: 15, top: 5, bottom: 15),
+              child: TextField(
+                keyboardType: TextInputType.number,
+                controller: distanceController,
+                obscureText: false,
+                decoration: const InputDecoration(
+                  suffix: Text('Miles',
+                      style: TextStyle(color: Colors.black),
+                      textAlign: TextAlign.left),
+                  label: Text('Max distance willing to travel'),
+                  border: OutlineInputBorder(),
+                  hintText: 'Max distance willing to travel in miles',
+                ),
+              ),
+            ),
+            MyButton(
+              text: "Save",
+              color: Colors.blue[300]!,
+              onPressed: () {
+                if (distanceController.text.isNotEmpty) {
+                  widget.user.maxDistance = num.parse(distanceController.text);
+                }
+                final userRef = FirebaseFirestore.instance
+                    .collection('users')
+                    .where('email', isEqualTo: widget.user.email)
+                    .get();
+                userRef.then((value) {
+                  for (var element in value.docs) {
+                    FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(element.id)
+                        .update({
+                      'maxDistance': widget.user.maxDistance,
+                    });
+                  }
+                });
+                setState(() {
+                  distanceController.clear();
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

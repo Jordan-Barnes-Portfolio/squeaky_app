@@ -1,11 +1,17 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:squeaky_app/components/my_button.dart';
-import 'package:squeaky_app/components/my_large_text_field.dart';
-import 'package:squeaky_app/objects/user.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:neatfreak/api/firebase_api.dart';
+import 'package:neatfreak/components/my_button.dart';
+import 'package:neatfreak/components/my_large_text_field.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/util/utils.dart';
 
 // ignore: must_be_immutable
 class CleanerRegistrationPage2 extends StatelessWidget {
@@ -18,6 +24,7 @@ class CleanerRegistrationPage2 extends StatelessWidget {
     final pphController = TextEditingController();
     final bioController = TextEditingController();
     final skillsController = TextEditingController();
+    final maxDistanceController = TextEditingController();
 
     //Functions
     void handleNextSubmit() async {
@@ -48,6 +55,8 @@ class CleanerRegistrationPage2 extends StatelessWidget {
       user.bio = bioController.text;
       user.skills = skillsController.text;
       user.uuid = UniqueKey().toString();
+      user.fcmToken = user.fcmToken = await FirebaseApi().getFCMToken();
+      user.maxDistance = num.parse(maxDistanceController.text);
 
       user.firstName = user.firstName[0].toUpperCase() +
           user.firstName.substring(1); // Capitalize the first letter
@@ -131,8 +140,52 @@ class CleanerRegistrationPage2 extends StatelessWidget {
                     ),
                   )
                 ],
-              ),
+              ),  
             ),
+            Padding(
+                padding: const EdgeInsets.only(
+                    left: 15, right: 15, top: 5, bottom: 15),
+                child: Row(children: [
+                  Text("Upload a profile picture: "),
+                  IconButton(
+                    icon: const Icon(Icons.camera_alt_outlined),
+                    onPressed: () async {
+                      try {
+                        String image = await pickImage(ImageSource.gallery);
+                        var imageFile = File(image);
+
+                        FirebaseStorage storage = FirebaseStorage.instance;
+                        final userRef = FirebaseFirestore.instance
+                            .collection('users')
+                            .where('email', isEqualTo: user.email)
+                            .get();
+                        Reference ref = storage
+                            .ref()
+                            .child("images/${user.uuid.replaceAll('-', '')}");
+                        UploadTask uploadTask = ref.putFile(imageFile);
+                        await uploadTask.whenComplete(() async {
+                          var url = await ref.getDownloadURL();
+                          user.profilePhoto = url.toString();
+                          await userRef.then((value) {
+                            for (var element in value.docs) {
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(element.id)
+                                  .update({
+                                'profilePhoto': url.toString(),
+                              });
+                            }
+                          });
+                        // ignore: body_might_complete_normally_catch_error
+                        }).catchError((onError) {
+                          print(onError);
+                        });
+                      } catch (e) {
+                        print(e);
+                      }
+                    },
+                  ),
+                ])),
             Padding(
               padding: const EdgeInsets.only(
                   left: 15, right: 15, top: 5, bottom: 15),
@@ -147,6 +200,23 @@ class CleanerRegistrationPage2 extends StatelessWidget {
                   label: Text('Price per hour'),
                   border: OutlineInputBorder(),
                   hintText: 'Price per hour in \$',
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(
+                  left: 15, right: 15, top: 5, bottom: 15),
+              child: TextField(
+                keyboardType: TextInputType.number,
+                controller: maxDistanceController,
+                obscureText: false,
+                decoration: const InputDecoration(
+                  suffix: Text('Miles',
+                      style: TextStyle(color: Colors.black),
+                      textAlign: TextAlign.left),
+                  label: Text('Max distance willing to travel'),
+                  border: OutlineInputBorder(),
+                  hintText: 'Max distance willing to travel in miles',
                 ),
               ),
             ),

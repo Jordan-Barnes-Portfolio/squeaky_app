@@ -1,6 +1,6 @@
 {
-    "name": "squeaky_app",
-    "short_name": "squeaky_app",
+    "name": "neatfreak",
+    "short_name": "neatfreak",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

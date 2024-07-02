@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:squeaky_app/objects/appointment.dart';
-import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/services/chat_service.dart';
+import 'package:neatfreak/objects/appointment.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/services/chat_service.dart';
 
 class AppointmentService extends ChangeNotifier {
   final FirebaseFirestore _firebase = FirebaseFirestore.instance;
@@ -185,7 +185,8 @@ class AppointmentService extends ChangeNotifier {
     }
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getAllCompletedAppointments(String email) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> getAllCompletedAppointments(
+      String email) {
     try {
       final appointments = _firebase
           .collection('users')

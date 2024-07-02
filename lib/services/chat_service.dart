@@ -2,18 +2,25 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:squeaky_app/objects/appointment.dart';
-import 'package:squeaky_app/objects/chat_room.dart';
-import 'package:squeaky_app/objects/message.dart';
-import 'package:squeaky_app/objects/user.dart';
+import 'package:neatfreak/api/firebase_api.dart';
+import 'package:neatfreak/objects/appointment.dart';
+import 'package:neatfreak/objects/chat_room.dart';
+import 'package:neatfreak/objects/message.dart';
+import 'package:neatfreak/objects/user.dart';
 
 class ChatService extends ChangeNotifier {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // SENDING A MESSAGE
-  Future<void> sendMessage(String recieverEmail, String message, AppUser user,
-      bool containsQuote, bool containsInvoice, bool systemMessage, Appointment ?appointment) async {
+  Future<void> sendMessage(
+      String recieverEmail,
+      String message,
+      AppUser user,
+      bool containsQuote,
+      bool containsInvoice,
+      bool systemMessage,
+      Appointment? appointment) async {
     //get current user info
     final String currentUserEmail = _firebaseAuth.currentUser!.email!;
     final DateTime timestamp = DateTime.now();
@@ -67,6 +74,15 @@ class ChatService extends ChangeNotifier {
     var cleaner = snapshot.docs
         .firstWhere((element) => element.id == usersList['cleaner']);
 
+    if (user.fcmToken != customer['fcmToken']) {
+      await FirebaseApi().sendNotification(customer['fcmToken']);
+    } else {
+      await FirebaseApi().sendNotification(cleaner['fcmToken']);
+    }
+
+    bool seenByCleaner = user.isCleaner;
+    bool seenByCustomer = user.isCustomer;
+
     if (!chatRoom.exists) {
       Chat newChat = Chat(
         userEmails: usersList,
@@ -76,12 +92,14 @@ class ChatService extends ChangeNotifier {
         lastMessage: message,
         formattedTime: readTimestamp(timestamp.millisecondsSinceEpoch),
         unformattedTime: Timestamp.now(),
+        seenByCleaner: seenByCleaner,
+        seenByCustomer: seenByCustomer,
       );
       await chats.set(newChat.toMap());
     } else {
       var time = readTimestamp(timestamp.millisecondsSinceEpoch);
-      updateChatRoom(
-          chatRoom, message, time, customer['firstName'], cleaner['firstName']);
+      updateChatRoom(chatRoom, message, time, customer['firstName'],
+          cleaner['firstName'], seenByCleaner, seenByCustomer);
     }
   }
 
@@ -95,7 +113,7 @@ class ChatService extends ChangeNotifier {
         .collection('chats')
         .doc(chatRoomId)
         .collection('messages')
-        .orderBy('timestamp')
+        .orderBy('orderBy')
         .snapshots();
   }
 
@@ -112,13 +130,27 @@ class ChatService extends ChangeNotifier {
       String message,
       String timestamp,
       String customerFirstName,
-      String cleanerFirstName) {
+      String cleanerFirstName,
+      bool seenByCleaner,
+      bool seenByCustomer) {
     chatRoom.reference.update({
       'customerFirstName': customerFirstName,
       'cleanerFirstName': cleanerFirstName,
       'lastMessage': message,
       'formattedTime': timestamp.toString(),
       'unformattedTime': Timestamp.now(),
+      'seenByCleaner': seenByCleaner,
+      'seenByCustomer': seenByCustomer,
+    });
+  }
+
+  void updateChatRoomSeenBy(String type, String chatRoomId) {
+    _firestore.collection('chats').doc(chatRoomId).get().then((value) {
+      if (type == 'customer') {
+        value.reference.update({'seenByCustomer': true});
+      } else {
+        value.reference.update({'seenByCleaner': true});
+      }
     });
   }
 
@@ -141,6 +173,29 @@ class ChatService extends ChangeNotifier {
       return DateFormat('EEEE, dd MMMM yyyy').format(date);
     } else {
       return DateFormat('EEEE, dd MMMM').format(date);
+    }
+  }
+
+  void deleteAllChats() async {
+    try {
+      print('starting hat deletion...');
+      try {
+        await FirebaseFirestore.instance
+            .collection('chats')
+            .snapshots()
+            .forEach((element) {
+          for (var doc in element.docs) {
+            print('Deleted chat: ${doc.id}');
+            doc.reference.delete();
+          }
+        });
+      } catch (e) {
+        print('error deleting chat: $e');
+      }
+
+    } on Exception catch (e) {
+      print('exception thrown..');
+      throw Exception(e.toString());
     }
   }
 

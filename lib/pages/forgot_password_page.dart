@@ -1,8 +1,8 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
-import 'package:squeaky_app/components/my_button.dart';
-import 'package:squeaky_app/components/my_text_field.dart';
+import 'package:neatfreak/components/my_button.dart';
+import 'package:neatfreak/components/my_text_field.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
   ForgotPasswordPage({super.key});
@@ -32,11 +32,7 @@ class ForgotPasswordPage extends StatelessWidget {
             const SizedBox(height: 25),
 
             //logo
-            const Icon(
-              //TODO: \/\/\/ replace with our logo eventually
-              Icons.account_circle,
-              size: 100,
-            ),
+            const Text('Forgot Password?', style: TextStyle(fontSize: 26)),
 
             const SizedBox(height: 25),
 

@@ -2,8 +2,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:squeaky_app/components/my_button.dart';
-import 'package:squeaky_app/objects/user.dart';
+import 'package:neatfreak/api/firebase_api.dart';
+import 'package:neatfreak/components/my_button.dart';
+import 'package:neatfreak/objects/user.dart';
 
 class CustomerRegistrationPage3 extends StatefulWidget {
   final AppUser user; // AppUser object
@@ -60,6 +61,7 @@ class _CustomerRegistrationPage3State extends State<CustomerRegistrationPage3> {
     user.storiesCount =
         storiesCountController.text; // Assign the value to the user object
     user.sqftOfHome = sqftCountController.text;
+    user.fcmToken = user.fcmToken = await FirebaseApi().getFCMToken();
 
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(

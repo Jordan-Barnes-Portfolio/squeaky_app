@@ -2,14 +2,14 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:squeaky_app/components/messages_card.dart';
-import 'package:squeaky_app/components/my_appbar.dart';
-import 'package:squeaky_app/components/my_gnav_bar.dart';
-import 'package:squeaky_app/objects/appointment.dart';
-import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/chat_page.dart';
-import 'package:squeaky_app/pages/error_page.dart';
-import 'package:squeaky_app/services/chat_service.dart';
+import 'package:neatfreak/components/customer_messages_card.dart';
+import 'package:neatfreak/components/my_appbar.dart';
+import 'package:neatfreak/components/my_gnav_bar.dart';
+import 'package:neatfreak/objects/appointment.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/pages/chat_page.dart';
+import 'package:neatfreak/pages/error_page.dart';
+import 'package:neatfreak/services/chat_service.dart';
 
 class CustomerMessagesPage extends StatefulWidget {
   final AppUser user; // AppUser object
@@ -78,30 +78,41 @@ class _CustomerMessagesPage extends State<CustomerMessagesPage> {
                   itemBuilder: (context, index) {
                     final data =
                         documents[index].data() as Map<String, dynamic>;
-                    return MessagesCard(
-                      customFunction: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ChatPage(
-                                    appointment: Appointment(
-                                        formattedDate: '',
-                                        details: '',
-                                        unformattedDate: '',
-                                        status: 'scheduled',
-                                        invoice: null,
-                                        sortByDate: null),
-                                    initialMessage: '',
-                                    receiverFirstName: data['cleanerFirstName'],
-                                    recieverUserEmail: data['userEmails']
-                                        ['cleaner'],
-                                    user: widget.user)));
-                      },
-                      name: data['cleanerFirstName'],
-                      lastMessage: data['lastMessage'],
-                      time: data['formattedTime'],
-                      recieverEmail: data['userEmails']['cleaner'],
-                    );
+                    return CustomerMessagesCard(
+                        customFunction: () {
+
+                        //construct chat room id from current user id and receiver id (sorted to avoid duplicates)
+                        List<String> ids = [widget.user.email, data['userEmails']['cleaner']];
+                        ids.sort();
+                        String chatRoomId = ids.join('_');
+
+                        ChatService().updateChatRoomSeenBy('customer', chatRoomId);
+
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ChatPage(
+                                      appointment: Appointment(
+                                          formattedDate: '',
+                                          details: '',
+                                          unformattedDate: '',
+                                          status: 'scheduled',
+                                          invoice: null,
+                                          sortByDate: null),
+                                      initialMessage: '',
+                                      receiverFirstName:
+                                          data['cleanerFirstName'],
+                                      recieverUserEmail: data['userEmails']
+                                          ['cleaner'],
+                                      user: widget.user)));
+                        },
+                        name: data['cleanerFirstName'],
+                        lastMessage: data['lastMessage'],
+                        time: data['formattedTime'],
+                        recieverEmail: data['userEmails']['cleaner'],
+                        seenByCustomer: data['seenByCustomer'],
+                        seenByCleaner: data['seenByCleaner'],
+                        user: widget.user);
                   },
                 );
               },

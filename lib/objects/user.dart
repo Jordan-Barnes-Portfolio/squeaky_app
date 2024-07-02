@@ -1,5 +1,6 @@
 // ignore_for_file: unnecessary_getters_setters
-import 'package:squeaky_app/objects/review.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:neatfreak/objects/review.dart';
 
 class AppUser {
   //Every account has these parameters
@@ -10,6 +11,9 @@ class AppUser {
   String _phoneNumber;
   String _address;
   String _uuid;
+  String _fcmToken;
+  num _maxDistance = 0;
+  GeoPoint _location;
 
   //These are dependent
   String _bio;
@@ -24,6 +28,7 @@ class AppUser {
   String _profilePhoto;
   String _skills;
   String _heroPhoto;
+  String _impInformation;
   num _pricing;
   bool _hasNotification;
   List<Review> _reviews = [];
@@ -36,11 +41,15 @@ class AppUser {
     //Required parameters
     required String email,
     required String password,
+    String impInformation = "none",
     String firstName = "none",
     String lastName = "none",
     String phoneNumber = "none",
     String address = "none",
     String uuid = "",
+    String ?fcmToken = "",
+    GeoPoint ?location,
+    num maxDistance = 0,
 
     //Default and optional parameters
     String bio = "none",
@@ -65,6 +74,7 @@ class AppUser {
     //Constructor
   })  : _email = email,
         _password = password,
+        _impInformation = impInformation,
         _firstName = firstName,
         _lastName = lastName,
         _phoneNumber = phoneNumber,
@@ -86,9 +96,24 @@ class AppUser {
         _uuid = uuid,
         _hasNotification = hasNotification,
         _reviews = reviews,
+        _fcmToken = fcmToken ?? "",
+        _location = location ?? GeoPoint(0, 0),
+        _maxDistance = maxDistance,
         _houseType = houseType;
 
   //Getters and setters
+  num get maxDistance => _maxDistance;
+  set maxDistance(num value) => _maxDistance = value;
+
+  String get impInformation => _impInformation;
+  set impInformation(String value) => _impInformation = value;
+
+  String get fcmToken => _fcmToken;
+  set fcmToken(String value) => _fcmToken = value;
+
+  GeoPoint get location => _location;
+  set location(GeoPoint value) => _location = value;
+
   List<Review> get reviews => _reviews;
   set reviews(List<Review> value) => _reviews = value;
 
@@ -166,6 +191,8 @@ class AppUser {
       'email': _email,
       'password': _password,
       'firstName': _firstName,
+      'impInformation': _impInformation, // 'none
+      'maxDistance': _maxDistance, // 0
       'lastName': _lastName,
       'phoneNumber': _phoneNumber,
       'address': _address,
@@ -184,8 +211,10 @@ class AppUser {
       'profilePhoto': _profilePhoto,
       'skills': _skills,
       'uuid': _uuid,
+      'fcmToken': _fcmToken,
       'reviews': _reviews.map((e) => e.toMap()).toList(),
       'hasNotification': _hasNotification,
+      'location': _location,
       'heroPhoto': _heroPhoto,
     };
   }
@@ -200,13 +229,17 @@ class AppUser {
         phoneNumber: map['phoneNumber'] as String,
         address: map['address'] as String,
         bio: map['bio'] as String,
+        maxDistance: map['maxDistance'] as num,
+        location: map['location'] ?? const GeoPoint(0, 0),
         pricing: map['pricing'] as num,
         storiesCount: map['storiesCount'] as String,
         floorType: map['floorType'] as String,
         amountOfBathrooms: map['amountOfBathrooms'] as String,
         amountOfBedrooms: map['amountOfBedrooms'] as String,
+        impInformation: map['impInformation'] as String,
         sqftOfHome: map['sqftOfHome'] as String,
         houseType: map['houseType'] as String,
+        fcmToken: map['fcmToken'] ?? "",
         isCleaner: map['isCleaner'] as bool,
         isCustomer: map['isCustomer'] as bool,
         hasNotification: map['hasNotification'] as bool,

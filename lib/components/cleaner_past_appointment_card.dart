@@ -1,9 +1,9 @@
 // ignore_for_file: use_key_in_widget_constructors
 
 import 'package:flutter/material.dart';
-import 'package:squeaky_app/objects/appointment.dart';
-import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/customer/customer_view_past_appointment_details_page.dart';
+import 'package:neatfreak/objects/appointment.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/pages/customer/customer_view_past_appointment_details_page.dart';
 
 class CleanerPastAppointmentCard extends StatelessWidget {
   final Appointment appointment;

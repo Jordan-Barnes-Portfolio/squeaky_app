@@ -1,9 +1,9 @@
 // ignore_for_file: use_key_in_widget_constructors, must_be_immutable
 
 import 'package:flutter/material.dart';
-import 'package:squeaky_app/objects/appointment.dart';
-import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/view_appointment_details_page.dart';
+import 'package:neatfreak/objects/appointment.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/pages/view_appointment_details_page.dart';
 
 class CustomerAppointmentCard extends StatelessWidget {
   final Appointment appointment;

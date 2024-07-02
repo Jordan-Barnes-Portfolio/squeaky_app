@@ -1,12 +1,12 @@
 // ignore_for_file: unused_local_variable, must_be_immutable, library_private_types_in_public_api
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:squeaky_app/components/cleaner_appointment_card.dart';
-import 'package:squeaky_app/components/my_appbar.dart';
-import 'package:squeaky_app/components/my_gnav_bar.dart';
-import 'package:squeaky_app/objects/appointment.dart';
-import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/services/appointment_service.dart';
+import 'package:neatfreak/components/cleaner_appointment_card.dart';
+import 'package:neatfreak/components/my_appbar.dart';
+import 'package:neatfreak/components/my_gnav_bar.dart';
+import 'package:neatfreak/objects/appointment.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/services/appointment_service.dart';
 
 class CleanerMainPage extends StatefulWidget {
   final AppUser user; // AppUser object

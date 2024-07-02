@@ -2,8 +2,9 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/customer/customer_booking_page.dart';
+import 'package:neatfreak/components/review_card.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/pages/customer/customer_booking_page.dart';
 
 class CleanerDetailsPage extends StatefulWidget {
   AppUser cleaner;
@@ -44,6 +45,7 @@ class _CleanerDetailsPage extends State<CleanerDetailsPage>
       backgroundColor: Colors.grey[200],
       body: SingleChildScrollView(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             topBarForCleaner(),
             const SizedBox(height: 60),
@@ -55,7 +57,13 @@ class _CleanerDetailsPage extends State<CleanerDetailsPage>
   }
 
   Widget tabViews() {
-    TabController newTabControl = TabController(length: widget.cleaner.reviews.length, vsync: this);
+    var reviewsLength = 0;
+
+    if (widget.cleaner.reviews.length > 3) {
+      reviewsLength = 3;
+    } else {
+      reviewsLength = widget.cleaner.reviews.length;
+    }
 
     return DefaultTabController(
       length: 2,
@@ -73,72 +81,69 @@ class _CleanerDetailsPage extends State<CleanerDetailsPage>
             ],
           ),
           const SizedBox(height: 20),
-          SizedBox(
-            height: 300,
-            width: MediaQuery.of(context).size.width,
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 300),
             child: TabBarView(
               children: [
-                SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(20.0, 0.0, 0.0, 0.0),
-                        child: Text('About',
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20.0, 0.0, 0.0, 0.0),
-                        child: Text(widget.cleaner.bio,
-                            style: const TextStyle(fontSize: 15)),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(20.0, 0.0, 0.0, 0.0),
-                        child: Text('Skills',
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20.0, 0.0, 0.0, 0.0),
-                        child: Text(widget.cleaner.bio,
-                            style: const TextStyle(fontSize: 15)),
-                      ),
-                      const SizedBox(
-                        height: 40,
-                      )
-                    ],
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(20.0, 0.0, 0.0, 0.0),
+                      child: Text('About',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20.0, 0.0, 0.0, 0.0),
+                      child: Text(widget.cleaner.bio,
+                          style: const TextStyle(fontSize: 15)),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(20.0, 0.0, 0.0, 0.0),
+                      child: Text('Skills',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20.0, 0.0, 0.0, 0.0),
+                      child: Text(widget.cleaner.bio,
+                          style: const TextStyle(fontSize: 15)),
+                    ),
+                    const SizedBox(
+                      height: 40,
+                    )
+                  ],
+                ),
+                Column(children: [
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(20.0, 0.0, 0.0, 0.0),
+                    child: Text('Latest 3 reviews',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold)),
                   ),
-                ),
-                TabPageSelector(
-                  color: Colors.black,
-                  selectedColor: Colors.blue,
-                  indicatorSize: 10,
-                  controller: newTabControl,
-                ),
-                widget.cleaner.ratings == 0
-                    ? const Text(
-                        'No reviews.. yet...',
-                        textAlign: TextAlign.center,
-                      )
-                    : PageView.builder(
-                        onPageChanged: (value) => newTabControl.animateTo(value),
-                        itemCount: widget.cleaner.reviews.length - 1,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            title: Text(
-                                'Review from ${widget.cleaner.reviews[index].reviewerName}'),
-                            subtitle: Text(
-                                'Rating: ${widget.cleaner.reviews[index].rating.toString()}\n${widget.cleaner.reviews[index].details}'),
-                          );
-                        },
-                      ),
+                  widget.cleaner.ratings == 0
+                      ? const Text(
+                          'No reviews.. yet...',
+                          textAlign: TextAlign.center,
+                        )
+                      : Expanded(
+                          child: ListView.builder(
+                            scrollDirection: Axis.vertical,
+                            itemCount: reviewsLength,
+                            itemBuilder: (context, index) {
+                              return ReviewCard(
+                                  review: widget.cleaner.reviews[index]);
+                            },
+                          ),
+                        ),
+                ]),
               ],
             ),
-          ),
+          )
         ],
       ),
     );
@@ -195,7 +200,7 @@ class _CleanerDetailsPage extends State<CleanerDetailsPage>
           bottom: -52,
           left: 134,
           child: Text(
-            widget.cleaner.rating.toString(),
+            widget.cleaner.rating.toStringAsFixed(1),
             style: const TextStyle(
               fontSize: 14,
               color: Colors.black,

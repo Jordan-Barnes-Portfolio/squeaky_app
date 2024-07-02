@@ -1,12 +1,12 @@
 // ignore_for_file: must_be_immutable, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
-import 'package:squeaky_app/components/my_button.dart';
-import 'package:squeaky_app/components/my_gnav_bar.dart';
-import 'package:squeaky_app/objects/appointment.dart';
-import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/chat_page.dart';
-import 'package:squeaky_app/services/appointment_service.dart';
+import 'package:neatfreak/components/my_button.dart';
+import 'package:neatfreak/components/my_gnav_bar.dart';
+import 'package:neatfreak/objects/appointment.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/pages/chat_page.dart';
+import 'package:neatfreak/services/appointment_service.dart';
 
 class AppointmentDetailsPage extends StatefulWidget {
   final AppUser user; // AppUser object

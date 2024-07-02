@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:squeaky_app/components/my_button.dart';
-import 'package:squeaky_app/pages/cleaner/cleaner_registration_page.dart';
-import 'package:squeaky_app/pages/customer/customer_registration_page.dart';
-import 'package:squeaky_app/pages/login_page.dart';
+import 'package:neatfreak/components/my_button.dart';
+import 'package:neatfreak/pages/cleaner/cleaner_registration_page.dart';
+import 'package:neatfreak/pages/customer/customer_registration_page.dart';
+import 'package:neatfreak/pages/login_page.dart';
 
 class AppStartupPage extends StatelessWidget {
   const AppStartupPage({super.key});
@@ -33,11 +33,7 @@ class AppStartupPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             //logo
-            const Icon(
-              //TODO: \/\/\/ replace with our logo eventually
-              Icons.clean_hands,
-              size: 100,
-            ),
+            const Image(image: AssetImage('lib/assets/logo.png'), height: 200, width: 300),
 
             const SizedBox(height: 15),
 

@@ -4,15 +4,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:intl/intl.dart';
-import 'package:squeaky_app/components/my_button.dart';
-import 'package:squeaky_app/components/my_chat_bubble.dart';
-import 'package:squeaky_app/components/my_chat_button.dart';
-import 'package:squeaky_app/components/my_gnav_bar.dart';
-import 'package:squeaky_app/objects/appointment.dart';
-import 'package:squeaky_app/objects/invoice.dart';
-import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/services/appointment_service.dart';
-import 'package:squeaky_app/services/chat_service.dart';
+import 'package:neatfreak/components/my_button.dart';
+import 'package:neatfreak/components/my_chat_bubble.dart';
+import 'package:neatfreak/components/my_chat_button.dart';
+import 'package:neatfreak/components/my_gnav_bar.dart';
+import 'package:neatfreak/objects/appointment.dart';
+import 'package:neatfreak/objects/invoice.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/pages/payment_options_page.dart';
+import 'package:neatfreak/services/chat_service.dart';
 
 class ChatPage extends StatefulWidget {
   final String recieverUserEmail;
@@ -149,8 +149,12 @@ class _ChatPageState extends State<ChatPage> {
                                   '${widget.user.firstName} ${widget.user.lastName[0]}.';
                               appointment.invoice?.cleanerName =
                                   widget.receiverFirstName;
-                              AppointmentService()
-                                  .createAppointment(appointment, widget.user);
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => PaymentOptionsPage(
+                                          user: widget.user,
+                                          appointment: appointment)));
                             },
                             text: 'Continue to payment',
                             color: Colors.blue[300]!,
@@ -170,7 +174,7 @@ class _ChatPageState extends State<ChatPage> {
     num? currentPrice = widget.user.pricing * selectedHours!;
     num? neatFreakGuarantee = currentPrice * 0.15;
     num? total = currentPrice + neatFreakGuarantee;
-    num? taxes = total * 0.065;
+    num? taxes = (total * 0.07) + 0.30 + (total * 0.029);
     String taxesString = taxes.toStringAsFixed(2);
     String totalString = total.toStringAsFixed(2);
     String neatFreakGuaranteeString = neatFreakGuarantee.toStringAsFixed(2);
@@ -279,7 +283,7 @@ class _ChatPageState extends State<ChatPage> {
                               total = currentPrice! + neatFreakGuarantee!;
                               totalString = total!.toStringAsFixed(2);
 
-                              taxes = total! * 0.065;
+                              taxes = (total! * 0.07) + 0.30 + (total! * 0.029);
                               taxesString = taxes!.toStringAsFixed(2);
                             });
                           },
@@ -298,7 +302,7 @@ class _ChatPageState extends State<ChatPage> {
                     Padding(
                       padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
                       child: Text(
-                        'Quote: \n\$${widget.user.pricing} per hour * ($selectedHours) = \$$currentPrice \nNeat Freak Guarantee = \$$neatFreakGuaranteeString\nTaxes and Fees: \$$taxesString\nTotal: \$$totalString',
+                        'Quote: \n\$${widget.user.pricing} per hour * $selectedHours hr/s = \$$currentPrice \nNeat Freak Guarantee = \$$neatFreakGuaranteeString\nTaxes and Fees: \$$taxesString\nTotal: \$$totalString',
                         style: const TextStyle(fontSize: 16),
                         textAlign: TextAlign.left,
                       ),
@@ -396,33 +400,36 @@ class _ChatPageState extends State<ChatPage> {
             text: 'View Quote',
             color: const Color.fromARGB(255, 33, 177, 243),
             onPressed: () {
-              try{
-              Invoice invoice = Invoice(
-                  total: data['appointment']['invoice']['total'],
-                  hours: data['appointment']['invoice']['hours'],
-                  pricing: data['appointment']['invoice']['pricing'],
-                  taxes: data['appointment']['invoice']['taxes'],
-                  neatFreakGuarantee: data['appointment']['invoice']['neatFreakGuarantee'],
-                  tip: data['appointment']['invoice']['tip'],
-                  customerEmail: data['appointment']['invoice']['customerEmail'],
-                  cleanerEmail: data['appointment']['invoice']['cleanerEmail'],
-                  customerName: data['appointment']['invoice']['customerName'],
-                  cleanerName: data['appointment']['invoice']['cleanerName'],
-                  cleaner: AppUser.fromMap(data['appointment']['invoice']['cleaner'])
-              );
+              try {
+                Invoice invoice = Invoice(
+                    total: data['appointment']['invoice']['total'],
+                    hours: data['appointment']['invoice']['hours'],
+                    pricing: data['appointment']['invoice']['pricing'],
+                    taxes: data['appointment']['invoice']['taxes'],
+                    neatFreakGuarantee: data['appointment']['invoice']
+                        ['neatFreakGuarantee'],
+                    tip: data['appointment']['invoice']['tip'],
+                    customerEmail: data['appointment']['invoice']
+                        ['customerEmail'],
+                    cleanerEmail: data['appointment']['invoice']
+                        ['cleanerEmail'],
+                    customerName: data['appointment']['invoice']
+                        ['customerName'],
+                    cleanerName: data['appointment']['invoice']['cleanerName'],
+                    cleaner: AppUser.fromMap(
+                        data['appointment']['invoice']['cleaner']));
 
+                Appointment appointment = Appointment(
+                    unformattedDate: data['appointment']['unformattedDate'],
+                    formattedDate: data['appointment']['formattedDate'],
+                    details: data['appointment']['details'],
+                    sortByDate: Timestamp.fromDate(
+                        DateTime.parse(data['appointment']['unformattedDate'])),
+                    invoice: invoice,
+                    status: 'scheduled');
 
-              Appointment appointment = Appointment(
-                  unformattedDate: data['appointment']['unformattedDate'],
-                  formattedDate: data['appointment']['formattedDate'],
-                  details: data['appointment']['details'],
-                  sortByDate: Timestamp.fromDate(
-                      DateTime.parse(data['appointment']['unformattedDate'])),
-                  invoice: invoice,
-                  status: 'scheduled');
-
-              createInvoice(appointment);
-              } catch(e){
+                createInvoice(appointment);
+              } catch (e) {
                 print('${e} HEHEEEEERRRRRRRRRRRRRRREEEEEEEEEE');
               }
             },
@@ -444,13 +451,9 @@ class _ChatPageState extends State<ChatPage> {
     if (data['systemMessage'] != null && data['systemMessage'] == true) {
       return Container(
         alignment: alignment,
-        child: Column(
-          children: [
-            ChatBubble(
-              message: data['message'],
-              color: Colors.grey,
-            ),
-          ],
+        child: ChatBubble(
+          message: data['message'],
+          color: Colors.grey,
         ),
       );
     }
@@ -458,15 +461,12 @@ class _ChatPageState extends State<ChatPage> {
     Color bubbleColor = alignment == Alignment.centerRight
         ? const Color.fromARGB(255, 33, 177, 243)
         : const Color.fromARGB(255, 62, 62, 62);
+
     return Container(
       alignment: alignment,
-      child: Column(
-        children: [
-          ChatBubble(
-            message: data['message'],
-            color: bubbleColor,
-          ),
-        ],
+      child: ChatBubble(
+        message: data['message'],
+        color: bubbleColor,
       ),
     );
   }

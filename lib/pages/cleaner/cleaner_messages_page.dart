@@ -2,13 +2,13 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:squeaky_app/components/messages_card.dart';
-import 'package:squeaky_app/components/my_appbar.dart';
-import 'package:squeaky_app/components/my_gnav_bar.dart';
-import 'package:squeaky_app/objects/appointment.dart';
-import 'package:squeaky_app/objects/user.dart';
-import 'package:squeaky_app/pages/chat_page.dart';
-import 'package:squeaky_app/services/chat_service.dart';
+import 'package:neatfreak/components/cleaner_messages_card.dart';
+import 'package:neatfreak/components/my_appbar.dart';
+import 'package:neatfreak/components/my_gnav_bar.dart';
+import 'package:neatfreak/objects/appointment.dart';
+import 'package:neatfreak/objects/user.dart';
+import 'package:neatfreak/pages/chat_page.dart';
+import 'package:neatfreak/services/chat_service.dart';
 
 class CleanerMessagesPage extends StatefulWidget {
   final AppUser user; // AppUser object
@@ -75,8 +75,15 @@ class _CleanerMessagesPage extends State<CleanerMessagesPage> {
                 itemCount: documents.length,
                 itemBuilder: (context, index) {
                   final data = documents[index].data() as Map<String, dynamic>;
-                  return MessagesCard(
+                  return CleanerMessagesCard(
                       customFunction: () {
+
+                        //construct chat room id from current user id and receiver id (sorted to avoid duplicates)
+                        List<String> ids = [widget.user.email, data['userEmails']['customer']];
+                        ids.sort();
+                        String chatRoomId = ids.join('_');
+
+                        ChatService().updateChatRoomSeenBy('cleaner', chatRoomId);
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -88,12 +95,16 @@ class _CleanerMessagesPage extends State<CleanerMessagesPage> {
                                         data['customerFirstName'],
                                     recieverUserEmail: data['userEmails']
                                         ['customer'],
-                                    user: widget.user)));
+                                    user: widget.user
+                                     )));
                       },
                       name: data['customerFirstName'],
                       lastMessage: data['lastMessage'],
                       time: data['formattedTime'],
-                      recieverEmail: data['userEmails']['customer']);
+                      recieverEmail: data['userEmails']['customer'],
+                      seenByCustomer: data['seenByCustomer'],
+                      user: widget.user,
+                      seenByCleaner: data['seenByCleaner']);
                 },
               );
             },

@@ -7,7 +7,9 @@ class Chat {
   final String customerFirstName;
   final String lastMessage;
   final String formattedTime;
-  final Timestamp unformattedTime; 
+  final Timestamp unformattedTime;
+  bool seenByCustomer = false;
+  bool seenByCleaner = false;
 
   Chat({
     required this.userEmails,
@@ -15,6 +17,8 @@ class Chat {
     required this.cleanerFirstName,
     required this.customerFirstName,
     required this.unformattedTime,
+    this.seenByCleaner = false,
+    this.seenByCustomer = false,
     this.lastMessage = "",
     this.formattedTime = "",
   });
@@ -27,6 +31,8 @@ class Chat {
       'cleanerFirstName': cleanerFirstName,
       'customerFirstName': customerFirstName,
       'lastMessage': lastMessage,
+      'seenByCleaner': seenByCleaner,
+      'seenByCustomer': seenByCustomer,
       'unformattedTime': unformattedTime,
       'formattedTime': formattedTime,
     };

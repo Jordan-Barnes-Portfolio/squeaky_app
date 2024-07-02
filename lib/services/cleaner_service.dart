@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:squeaky_app/objects/appointment.dart';
-import 'package:squeaky_app/objects/review.dart';
-import 'package:squeaky_app/objects/user.dart';
+import 'package:neatfreak/objects/appointment.dart';
+import 'package:neatfreak/objects/review.dart';
+import 'package:neatfreak/objects/user.dart';
 
 class CleanerService extends ChangeNotifier {
   final FirebaseFirestore _firebase = FirebaseFirestore.instance;

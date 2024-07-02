@@ -1,4 +1,4 @@
-# squeaky_app
+# neatfreak
 
 A new Flutter project.
 
