@@ -17,10 +17,12 @@ class CleanerMainPage extends StatefulWidget {
   _CleanerMainPage createState() => _CleanerMainPage();
 
   Future<void> getData() async {
-    final todaysAppointments =
-        AppointmentService().getTodaysAppointments(user.email);
-    final upcomingAppointments =
-        AppointmentService().getUpcomingAppointments(user.email);
+    try {
+      final todaysAppointments = await AppointmentService().getTodaysAppointments(user.email);
+      final upcomingAppointments = await AppointmentService().getUpcomingAppointments(user.email);
+    } catch (error) {
+      print('Error fetching data: $error');
+    }
   }
 }
 
@@ -54,16 +56,12 @@ class _CleanerMainPage extends State<CleanerMainPage> {
                 ],
               ),
               const SizedBox(height: 20),
-              SingleChildScrollView(
-                child: SizedBox(
-                  height: 500,
-                  width: MediaQuery.of(context).size.width,
-                  child: TabBarView(
-                    children: [
-                      _buildCurrentAppointmentList(),
-                      _buildFutureAppointmentList(),
-                    ],
-                  ),
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    _buildCurrentAppointmentList(),
+                    _buildFutureAppointmentList(),
+                  ],
                 ),
               )
             ],
@@ -77,6 +75,9 @@ class _CleanerMainPage extends State<CleanerMainPage> {
     return StreamBuilder<QuerySnapshot>(
       stream: AppointmentService().getTodaysAppointments(widget.user.email),
       builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
         if (!snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
@@ -126,6 +127,9 @@ class _CleanerMainPage extends State<CleanerMainPage> {
     return StreamBuilder<QuerySnapshot>(
       stream: AppointmentService().getUpcomingAppointments(widget.user.email),
       builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
         if (!snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
         }

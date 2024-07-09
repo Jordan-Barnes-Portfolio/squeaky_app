@@ -12,6 +12,7 @@ class AppUser {
   String _address;
   String _uuid;
   String _fcmToken;
+  String _stripeConnectId;
   num _maxDistance = 0;
   GeoPoint _location;
 
@@ -48,6 +49,7 @@ class AppUser {
     String address = "none",
     String uuid = "",
     String ?fcmToken = "",
+    String ?stripeConnectId = "",
     GeoPoint ?location,
     num maxDistance = 0,
 
@@ -82,6 +84,7 @@ class AppUser {
         _isCleaner = isCleaner,
         _bio = bio,
         _isCustomer = isCustomer,
+        
         _rating = rating,
         _ratings = ratings,
         _pricing = pricing,
@@ -97,6 +100,7 @@ class AppUser {
         _hasNotification = hasNotification,
         _reviews = reviews,
         _fcmToken = fcmToken ?? "",
+        _stripeConnectId = stripeConnectId ?? "",
         _location = location ?? GeoPoint(0, 0),
         _maxDistance = maxDistance,
         _houseType = houseType;
@@ -137,6 +141,9 @@ class AppUser {
 
   String get floorType => _floorType;
   set floorType(String value) => _floorType = value;
+
+  String get stripeConnectId => _stripeConnectId;
+  set stripeConnectId(String value) => _stripeConnectId = value;
 
   String get houseType => _houseType;
   set houseType(String value) => _houseType = value;
@@ -210,6 +217,7 @@ class AppUser {
       'floorType': _floorType,
       'profilePhoto': _profilePhoto,
       'skills': _skills,
+      'stripeConnectId': _stripeConnectId,
       'uuid': _uuid,
       'fcmToken': _fcmToken,
       'reviews': _reviews.map((e) => e.toMap()).toList(),
@@ -247,6 +255,7 @@ class AppUser {
         ratings: map['ratings'] as num,
         profilePhoto: map['profilePhoto'] as String,
         skills: map['skills'] as String,
+        stripeConnectId: map['stripeConnectId'] as String,
         reviews: List<Review>.from(
             map['reviews']?.map((x) => Review.fromMap(x)) ?? const []),
         heroPhoto: map['heroPhoto'] as String,

@@ -1,4 +1,3 @@
-// ignore_for_file: unused_local_variable, must_be_immutable, library_private_types_in_public_api
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map_math/flutter_geo_math.dart';
@@ -12,185 +11,313 @@ import 'package:neatfreak/objects/user.dart';
 import 'package:neatfreak/services/appointment_service.dart';
 
 class CustomerMainPage extends StatefulWidget {
-  AppUser user; // AppUser object
-  var currentPageIndex = 0;
-  var availCleaners = 0;
-  var flipped = false;
-  CustomerMainPage({super.key, required this.user});
+  final AppUser user;
+
+  const CustomerMainPage({Key? key, required this.user}) : super(key: key);
 
   @override
   _CustomerMainPage createState() => _CustomerMainPage();
-
-  final _fireStore = FirebaseFirestore.instance;
-  final ref = FirebaseFirestore.instance.collection('users').snapshots();
-  Future<void> getData() async {
-    final users = FirebaseFirestore.instance.collection('users');
-    var doc = await users.doc(user.email).get();
-    user = AppUser.fromMap(doc.data() as Map<String, dynamic>);
-    QuerySnapshot querySnapshot = await _fireStore.collection('users').get();
-    final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
-    final todaysAppointments =
-        AppointmentService().getTodaysAppointments(user.email);
-    final upcomingAppointments =
-        AppointmentService().getUpcomingAppointments(user.email);
-  }
 }
 
 class _CustomerMainPage extends State<CustomerMainPage> {
+  int currentPageIndex = 0;
+  int availCleaners = 0;
+  bool flipped = false;
+  final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
+  late Future<void> _dataLoadingFuture;
+  final Map<String, num> _distanceCache = {};
+
+  // Pagination variables
+  final int _pageSize = 5;
+  List<QueryDocumentSnapshot> _cleaners = [];
+  List<QueryDocumentSnapshot> _appointments = [];
+  bool _isLoadingMoreCleaners = false;
+  bool _isLoadingMoreAppointments = false;
+  bool _hasMoreCleaners = true;
+  bool _hasMoreAppointments = true;
+  DocumentSnapshot? _lastCleanerDocument;
+  DocumentSnapshot? _lastAppointmentDocument;
+
+  late ScrollController _cleanerScrollController;
+  late ScrollController _appointmentScrollController;
+
   @override
   void initState() {
     super.initState();
-    widget.getData();
-    _buildCleanerList();
+    _dataLoadingFuture = _loadInitialData();
+    _cleanerScrollController = ScrollController()
+      ..addListener(_scrollListenerCleaners);
+    _appointmentScrollController = ScrollController()
+      ..addListener(_scrollListenerAppointments);
+  }
+
+  @override
+  void dispose() {
+    _cleanerScrollController.removeListener(_scrollListenerCleaners);
+    _appointmentScrollController.removeListener(_scrollListenerAppointments);
+    _cleanerScrollController.dispose();
+    _appointmentScrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListenerCleaners() {
+    if (_cleanerScrollController.offset >=
+            _cleanerScrollController.position.maxScrollExtent &&
+        !_cleanerScrollController.position.outOfRange) {
+      _loadMoreCleaners();
+    }
+  }
+
+  void _scrollListenerAppointments() {
+    if (_appointmentScrollController.offset >=
+            _appointmentScrollController.position.maxScrollExtent &&
+        !_appointmentScrollController.position.outOfRange) {
+      _loadMoreAppointments();
+    }
+  }
+
+  Future<void> _loadInitialData() async {
+    await _loadInitialCleaners();
+    await _loadInitialAppointments();
+  }
+
+  Future<void> _loadInitialCleaners() async {
+    print('Starting to load initial cleaners');
+    final query = _fireStore
+        .collection('users')
+        .where('isCleaner', isEqualTo: true)
+        .orderBy('rating')
+        .limit(_pageSize);
+
+    print('Query: ${query.parameters}');
+
+    try {
+      final snapshot = await query.get();
+      print('Query executed. Number of documents: ${snapshot.docs.length}');
+
+      setState(() {
+        _cleaners = snapshot.docs;
+        if (_cleaners.isNotEmpty) {
+          _lastCleanerDocument = _cleaners.last;
+        }
+        _hasMoreCleaners = _cleaners.length == _pageSize;
+      });
+
+      print('Loaded ${_cleaners.length} cleaners initially');
+      _cleaners.forEach((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        print('Cleaner: ${data['firstName']}, isCleaner: ${data['isCleaner']}');
+      });
+    } catch (e) {
+      print('Error loading cleaners: $e');
+    }
+  }
+
+  Future<void> _loadMoreCleaners() async {
+    if (!_hasMoreCleaners || _isLoadingMoreCleaners) return;
+
+    setState(() {
+      _isLoadingMoreCleaners = true;
+    });
+
+    final query = _fireStore
+        .collection('users')
+        .where('isCleaner', isEqualTo: true)
+        .orderBy('rating')
+        .startAfterDocument(_lastCleanerDocument!)
+        .limit(_pageSize);
+
+    final snapshot = await query.get();
+    setState(() {
+      _cleaners.addAll(snapshot.docs);
+      _isLoadingMoreCleaners = false;
+      if (snapshot.docs.isNotEmpty) {
+        _lastCleanerDocument = snapshot.docs.last;
+      }
+      _hasMoreCleaners = snapshot.docs.length == _pageSize;
+    });
+  }
+
+  Future<void> _loadInitialAppointments() async {
+    final query = AppointmentService()
+        .getInitialPendingAppointments(widget.user.email, _pageSize);
+
+    final snapshot = await query.get();
+    setState(() {
+      _appointments = snapshot.docs;
+      if (_appointments.isNotEmpty) {
+        _lastAppointmentDocument = _appointments.last;
+      }
+      _hasMoreAppointments = _appointments.length == _pageSize;
+    });
+  }
+
+  Future<void> _loadMoreAppointments() async {
+    if (!_hasMoreAppointments || _isLoadingMoreAppointments) return;
+
+    setState(() {
+      _isLoadingMoreAppointments = true;
+    });
+
+    final query = AppointmentService().getMorePendingAppointments(
+        widget.user.email, _lastAppointmentDocument!, _pageSize);
+
+    final snapshot = await query.get();
+    setState(() {
+      _appointments.addAll(snapshot.docs);
+      _isLoadingMoreAppointments = false;
+      if (snapshot.docs.isNotEmpty) {
+        _lastAppointmentDocument = snapshot.docs.last;
+      }
+      _hasMoreAppointments = snapshot.docs.length == _pageSize;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    setState(() {
-      widget.getData();
-    });
-
-    return Scaffold(
-      appBar: MyAppBar(user: widget.user),
-      backgroundColor: Colors.grey[200],
-      bottomNavigationBar: MyGnavBar(
-          currentPageIndex: widget.currentPageIndex, user: widget.user),
-      body: SafeArea(
-        child: DefaultTabController(
-          length: 2,
-          child: Column(
-            children: [
-              TabBar(
-                dividerColor: Color(Colors.black.value),
-                labelColor: Colors.black,
-                unselectedLabelColor: Colors.grey,
-                indicatorColor: Colors.black,
-                indicatorSize: TabBarIndicatorSize.tab,
-                tabs: const [
-                  Tab(text: 'Cleaner\s in your area'),
-                  Tab(text: 'Upcoming Appointments'),
+    return FutureBuilder(
+      future: _dataLoadingFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (snapshot.hasError) {
+          return Scaffold(
+            body: Center(child: Text('Error: ${snapshot.error}')),
+          );
+        }
+        return Scaffold(
+          appBar: MyAppBar(user: widget.user),
+          backgroundColor: Colors.grey[200],
+          bottomNavigationBar: MyGnavBar(
+            currentPageIndex: currentPageIndex,
+            user: widget.user,
+          ),
+          body: SafeArea(
+            child: DefaultTabController(
+              length: 2,
+              child: Column(
+                children: [
+                  _buildTabBar(),
+                  const SizedBox(height: 20),
+                  Expanded(child: _buildTabBarView()),
                 ],
               ),
-              const SizedBox(height: 20),
-              SingleChildScrollView(
-                child: SizedBox(
-                  height: 550,
-                  width: MediaQuery.of(context).size.width,
-                  child: TabBarView(
-                    children: [
-                      _buildCleanerList(),
-                      _buildCurrentAppointmentList(),
-                    ],
-                  ),
-                ),
-              )
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTabBar() {
+    return const TabBar(
+      dividerColor: Colors.black,
+      labelColor: Colors.black,
+      unselectedLabelColor: Colors.grey,
+      indicatorColor: Colors.black,
+      indicatorSize: TabBarIndicatorSize.tab,
+      tabs: [
+        Tab(text: 'Cleaners in your area'),
+        Tab(text: 'Upcoming Appointments'),
+      ],
+    );
+  }
+
+  Widget _buildTabBarView() {
+    return TabBarView(
+      children: [
+        _buildCleanerList(),
+        _buildCurrentAppointmentList(),
+      ],
     );
   }
 
   Widget _buildCleanerList() {
-    return StreamBuilder<QuerySnapshot>(
-      stream: widget.ref,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
+    if (_cleaners.isEmpty) {
+      return const Center(child: Text('No cleaners available.'));
+    }
+
+    return ListView.builder(
+      controller: _cleanerScrollController,
+      itemCount: _cleaners.length + 1,
+      itemBuilder: (context, index) {
+        if (index == _cleaners.length) {
+          return _buildLoaderIndicator(_isLoadingMoreCleaners);
         }
-        final documents = snapshot.data!.docs;
-        return ListView.builder(
-          shrinkWrap: true,
-          itemCount: documents.length,
-          itemBuilder: (context, index) {
-            if (documents.length <= 1) {
-              return const Center(
-                  child: Text('No cleaners available in your area.. yet.'));
-            } else {
-              widget.flipped = true;
-              final document = documents[index];
-              final data = document.data() as Map<String, dynamic>;
-              if (data['isCleaner'] == true && data['maxDistance'] > calculateDistance(data['location'] as GeoPoint, widget.user.location)) {
-                widget.availCleaners++;
-                return CleanerCard(
-                  cleaner: AppUser.fromMap(data),
-                  user: widget.user,
-                );
-            } else {
-              if(widget.flipped){
-                return const SizedBox.shrink();
-              } else {
-                widget.flipped = true;
-                return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Text('No cleaners available in your area.. yet.'),
-                  ),
-                );
-              }
-              }
-            }
-          },
+        final data = _cleaners[index].data() as Map<String, dynamic>;
+        final cleanerLocation = data['location'] as GeoPoint;
+        final distance =
+            _getCachedDistance(cleanerLocation, widget.user.location);
+
+        // Debug logging
+        print(
+            'Cleaner: ${data['firstName']}, Distance: $distance, Max Distance: ${data['maxDistance']}');
+
+        // Remove the distance check for now
+        return CleanerCard(
+          cleaner: AppUser.fromMap(data),
+          user: widget.user,
         );
       },
     );
   }
 
   Widget _buildCurrentAppointmentList() {
-    var today = DateFormat('EEEE').format(DateTime.now());
-    return StreamBuilder<QuerySnapshot>(
-      stream: AppointmentService().getAllPendingAppointments(widget.user.email),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
+    return ListView.builder(
+      controller: _appointmentScrollController,
+      itemCount: _appointments.length + 1,
+      itemBuilder: (context, index) {
+        if (index == _appointments.length) {
+          return _buildLoaderIndicator(_isLoadingMoreAppointments);
         }
-        final documents = snapshot.data!.docs;
-        if (documents.isEmpty) {
-          return const Center(
-              child: Padding(
-                  padding: EdgeInsets.all(20),
-                  child: Text('No appointments..',
-                      style: TextStyle(fontSize: 16))));
-        }
-        return ListView.builder(
-          shrinkWrap: true,
-          itemCount: documents.length,
-          itemBuilder: (context, index) {
-            final document = documents[index];
-            final data = document.data() as Map<String, dynamic>;
-            var now = DateTime.now();
-            var yesterday =
-                DateTime(now.year, now.month, now.day - 1, 23, 59, 59);
-            DateTime date = data['sortByDate'].toDate();
-
-            if (data['formattedDate'].toString().contains(today.toString())) {
-              var formattedDate =
-                  data['formattedDate'].toString().split('at')[1];
-              data['formattedDate'] = 'Today at$formattedDate';
-              return CustomerAppointmentCard(
-                appointment: Appointment.fromMap(data),
-                user: widget.user,
-              );
-            } else if (date.isBefore(yesterday)) {
-              return CustomerAppointmentCard(
-                appointment: Appointment.fromMap(data),
-                user: widget.user,
-                pastDue: true,
-              );
-            } else {
-              return CustomerAppointmentCard(
-                appointment: Appointment.fromMap(data),
-                user: widget.user,
-              );
-            }
-          },
-        );
+        final data = _appointments[index].data() as Map<String, dynamic>;
+        return _buildAppointmentCard(data);
       },
     );
   }
 
-  num calculateDistance(GeoPoint location1, GeoPoint location2) {
-    return FlutterMapMath().distanceBetween(location1.latitude,
-        location1.longitude, location2.latitude, location2.longitude, "miles");
+  Widget _buildLoaderIndicator(bool isLoading) {
+    return isLoading
+        ? const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Center(child: CircularProgressIndicator()),
+          )
+        : const SizedBox.shrink();
+  }
+
+  Widget _buildAppointmentCard(Map<String, dynamic> data) {
+    final now = DateTime.now();
+    final yesterday = DateTime(now.year, now.month, now.day - 1, 23, 59, 59);
+    final date = (data['sortByDate'] as Timestamp).toDate();
+    final today = DateFormat('EEEE').format(now);
+
+    if (data['formattedDate'].toString().contains(today)) {
+      final formattedDate = data['formattedDate'].toString().split('at')[1];
+      data['formattedDate'] = 'Today at$formattedDate';
+    }
+
+    return CustomerAppointmentCard(
+      appointment: Appointment.fromMap(data),
+      user: widget.user,
+      pastDue: date.isBefore(yesterday),
+    );
+  }
+
+  num _getCachedDistance(GeoPoint location1, GeoPoint location2) {
+    final key =
+        '${location1.latitude},${location1.longitude}-${location2.latitude},${location2.longitude}';
+    if (!_distanceCache.containsKey(key)) {
+      _distanceCache[key] = FlutterMapMath().distanceBetween(
+        location1.latitude,
+        location1.longitude,
+        location2.latitude,
+        location2.longitude,
+        "miles",
+      );
+    }
+    return _distanceCache[key]!;
   }
 }

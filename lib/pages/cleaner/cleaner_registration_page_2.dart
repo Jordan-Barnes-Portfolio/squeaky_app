@@ -12,6 +12,7 @@ import 'package:neatfreak/components/my_button.dart';
 import 'package:neatfreak/components/my_large_text_field.dart';
 import 'package:neatfreak/objects/user.dart';
 import 'package:neatfreak/util/utils.dart';
+import 'package:uuid/uuid.dart';
 
 // ignore: must_be_immutable
 class CleanerRegistrationPage2 extends StatelessWidget {
@@ -54,7 +55,7 @@ class CleanerRegistrationPage2 extends StatelessWidget {
       user.pricing = double.parse(pphController.text);
       user.bio = bioController.text;
       user.skills = skillsController.text;
-      user.uuid = UniqueKey().toString();
+      user.uuid = const Uuid().v4();
       user.fcmToken = user.fcmToken = await FirebaseApi().getFCMToken();
       user.maxDistance = num.parse(maxDistanceController.text);
 

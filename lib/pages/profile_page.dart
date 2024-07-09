@@ -16,6 +16,7 @@ import 'package:neatfreak/services/authentication_gate.dart';
 import 'package:neatfreak/services/authentication_service.dart';
 import 'package:neatfreak/util/utils.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:uuid/uuid.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key, required this.user});
@@ -173,12 +174,7 @@ class _ProfilePage extends State<ProfilePage> {
             padding: const EdgeInsets.only(bottom: 5),
             child: InkWell(
               onTap: () {
-                //   Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => PastAppointmentsPage(user: widget.user)
-                //   ),
-                // );
+                launchUrlString('http://192.168.1.10:3000?userId=${widget.user.uuid}');
               },
               child: const Card(
                 elevation: 5,
@@ -198,13 +194,7 @@ class _ProfilePage extends State<ProfilePage> {
               ? Padding(
                   padding: const EdgeInsets.only(bottom: 5),
                   child: InkWell(
-                    onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //       builder: (context) => ReviewsPage(user: widget.user)),
-                      // );
-                    },
+                    onTap: () {},
                     child: const Card(
                       elevation: 5,
                       shadowColor: Colors.black12,

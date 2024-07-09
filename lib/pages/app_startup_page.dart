@@ -10,19 +10,38 @@ class AppStartupPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void handleCleanerSelection() {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => const CleanerRegistrationPage()),
-      );
+      try {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const CleanerRegistrationPage()),
+        );
+      } catch (error) {
+        _showErrorDialog(context, 'Failed to navigate to Cleaner Registration Page');
+      }
     }
 
     void handleNeedCleaningSelection() {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => const CustomerRegistrationPage()),
-      );
+      try {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const CustomerRegistrationPage()),
+        );
+      } catch (error) {
+        _showErrorDialog(context, 'Failed to navigate to Customer Registration Page');
+      }
+    }
+
+    void handleLogin() {
+      try {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
+      } catch (error) {
+        _showErrorDialog(context, 'Failed to navigate to Login Page');
+      }
     }
 
     return Scaffold(
@@ -33,10 +52,11 @@ class AppStartupPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             //logo
-            const Image(image: AssetImage('lib/assets/logo.png'), height: 200, width: 300),
-
+            const Image(
+                image: AssetImage('lib/assets/logo.png'),
+                height: 200,
+                width: 300),
             const SizedBox(height: 15),
-
             //welcome text
             const Padding(
               padding: EdgeInsets.all(32.0),
@@ -45,7 +65,6 @@ class AppStartupPage extends StatelessWidget {
                 style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
               ),
             ),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -61,9 +80,7 @@ class AppStartupPage extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 25),
-
             Padding(
               padding: const EdgeInsets.all(10),
               child: Row(
@@ -77,15 +94,9 @@ class AppStartupPage extends StatelessWidget {
                 ],
               ),
             ),
-
             //already have an account?
             GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                );
-              },
+              onTap: handleLogin,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -96,5 +107,25 @@ class AppStartupPage extends StatelessWidget {
             ),
           ],
         ))));
+  }
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

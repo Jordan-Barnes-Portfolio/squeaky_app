@@ -166,6 +166,29 @@ class AppointmentService extends ChangeNotifier {
     }
   }
 
+  Query<Map<String, dynamic>> getInitialPendingAppointments(
+      String email, int limit) {
+    return _firebase
+        .collection('users')
+        .doc(email)
+        .collection('appointments')
+        .orderBy('sortByDate')
+        .where('status', isEqualTo: 'scheduled')
+        .limit(limit);
+  }
+
+  Query<Map<String, dynamic>> getMorePendingAppointments(
+      String email, DocumentSnapshot lastDocument, int limit) {
+    return _firebase
+        .collection('users')
+        .doc(email)
+        .collection('appointments')
+        .orderBy('sortByDate')
+        .where('status', isEqualTo: 'scheduled')
+        .startAfterDocument(lastDocument)
+        .limit(limit);
+  }
+
   Stream<QuerySnapshot<Map<String, dynamic>>> getTodaysAppointments(
       String email) {
     try {
