@@ -16,7 +16,6 @@ import 'package:neatfreak/services/authentication_gate.dart';
 import 'package:neatfreak/services/authentication_service.dart';
 import 'package:neatfreak/util/utils.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:uuid/uuid.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key, required this.user});
